@@ -15,18 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ARTKBlenderModule.cpp">
+    <ClCompile Include="Sources\ARParam.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PyTypeRegistration.cpp">
+    <ClCompile Include="Sources\ARTKBlenderModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ARParam.cpp">
+    <ClCompile Include="Sources\PyTypeRegistration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PyTypeRegistration.h">
+    <ClInclude Include="Sources\PyTypeRegistration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
