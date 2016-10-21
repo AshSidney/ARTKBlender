@@ -28,7 +28,7 @@ namespace ARTKBlender
 {
 
 /**
-*   Class for Python types registration in module.
+    Class for Python types registration in module.
 
     Static objects of this class store information of Python types to be able to
     initialize them during module initialization.
@@ -62,14 +62,14 @@ protected:
   PyTypeObject & typeData;
 
   /**
-  Method to prepare type.
-  \return true, if this type was successfully prepared
+      Method to prepare type.
+      \return true, if this type was successfully prepared
   */
   virtual bool GetReady();
 
   /**
-  Method to add type to module.
-  \module module object
+      Method to add type to module.
+      \module module object
   */
   virtual void AddType(PyObject * module);
 

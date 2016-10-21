@@ -31,8 +31,8 @@ namespace ARTKBlender
 struct ARParamObject
 {
   PyObject_HEAD
-    /// ARParam structure
-    ARParam param;
+  /// ARParam structure
+  ARParam param;
 };
 
 

@@ -39,7 +39,7 @@ PyTypeRegistration::PyTypeRegistration (const char * name, PyTypeObject & data)
 bool PyTypeRegistration::GetReady ()
 {
   typeData.tp_new = PyType_GenericNew;
-  return PyType_Ready(&typeData) >= 0;
+  return PyType_Ready(&typeData) == 0;
 }
 
 // add python type to module
