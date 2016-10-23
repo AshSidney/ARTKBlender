@@ -29,5 +29,8 @@
     <ClInclude Include="Sources\PyTypeRegistration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\PyObjectHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

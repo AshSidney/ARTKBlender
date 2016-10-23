@@ -152,6 +152,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>D:\DevTools\ARToolKit5\lib\win64-x64;D:\DevTools\Python35\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>AR.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -160,6 +161,7 @@
     <ClCompile Include="Sources\PyTypeRegistration.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\PyObjectHelper.h" />
     <ClInclude Include="Sources\PyTypeRegistration.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

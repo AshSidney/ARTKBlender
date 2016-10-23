@@ -22,25 +22,85 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include <AR/ar.h>
 #include <Python.h>
 
+#include "PyObjectHelper.h"
 #include "PyTypeRegistration.h"
 
 namespace ARTKBlender
 {
 
 /// python data structure for ARParam
-struct ARParamObject
+struct PyARParam
 {
   PyObject_HEAD
   /// ARParam structure
-  ARParam param;
+  ARParam * param;
+};
+
+
+/// ARParam object allocation
+PyObject * PyARParam_new (PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  // allocate object
+  PyObject * self = type->tp_alloc(type, 0);
+  // initialize object structure
+  PyARParam * selfObj = getPyType<PyARParam>(self);
+  selfObj->param = new ARParam();
+  // return allocated object
+  return self;
+}
+
+// ARParam object deallocation
+void PyARParam_dealloc (PyARParam * self)
+{
+  // release ARParam
+  delete self->param;
+  // release object
+  deallocPyObject(self);
+}
+
+// get image size
+PyObject * PyARParam_getSize (PyARParam * self, void * closure)
+{
+  PyObject * size = PyTuple_New(2);
+
+}
+
+// load data file to ARParam object
+PyObject * PyARParam_load (PyARParam * self, PyObject * args)
+{
+  // get file name
+  const char * fileName;
+  if (!PyArg_ParseTuple(args, "s", fileName))
+    return Py_False;
+
+  // load data from file
+  return arParamLoad(fileName, 1, self->param) == 0 ? Py_True : Py_False;
+}
+
+
+// members descriptions
+PyGetSetDef PyARParam_getseters[] =
+{
+  { "size", (getter)PyARParam_getSize, (setter)PyARParam_setSize,
+    "image size", NULL },
+  { NULL }  /* Sentinel */
+};
+
+/// methods descriptions
+PyMethodDef PyARParam_methods[] =
+{
+  { "load", (PyCFunction)PyARParam_load, METH_VARARGS,
+    "Loads data from file, return true, if successful" },
+  { NULL }  /* Sentinel */
 };
 
 
 /// python type structure for ARParam
-static PyTypeObject ARParamType = {
+PyTypeObject ARParamType =
+{
   PyVarObject_HEAD_INIT(NULL, 0)
   "artk.ARParam",            /* tp_name */
-  sizeof(ARParamObject),     /* tp_basicsize */
+  sizeof(ARParam),           /* tp_basicsize */
   0,                         /* tp_itemsize */
   0,                         /* tp_dealloc */
   0,                         /* tp_print */
@@ -59,6 +119,23 @@ static PyTypeObject ARParamType = {
   0,                         /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT,        /* tp_flags */
   "ARParam objects",         /* tp_doc */
+  0,                         /* tp_traverse */
+  0,                         /* tp_clear */
+  0,                         /* tp_richcompare */
+  0,                         /* tp_weaklistoffset */
+  0,                         /* tp_iter */
+  0,                         /* tp_iternext */
+  PyARParam_methods,         /* tp_methods */
+  0,                         /* tp_members */
+  PyARParam_getseters,       /* tp_getset */
+  0,                         /* tp_base */
+  0,                         /* tp_dict */
+  0,                         /* tp_descr_get */
+  0,                         /* tp_descr_set */
+  0,                         /* tp_dictoffset */
+  0,                         /* tp_init */
+  0,                         /* tp_alloc */
+  PyARParam_new,             /* tp_new */
 };
 
 
