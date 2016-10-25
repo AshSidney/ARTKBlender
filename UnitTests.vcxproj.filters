@@ -16,6 +16,9 @@
     <Filter Include="Tested Files">
       <UniqueIdentifier>{02122a55-ebc6-418f-8755-860760a59509}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Python Test Files">
+      <UniqueIdentifier>{1a97af60-0837-437f-b752-7418086f2d47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UnitTests\PyTypeRegistrationTest.cpp">
@@ -24,5 +27,13 @@
     <ClCompile Include="Sources\PyTypeRegistration.cpp">
       <Filter>Tested Files</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTests\ARParamTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="UnitTests\Python\miniTest.py">
+      <Filter>Python Test Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

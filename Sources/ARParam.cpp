@@ -61,15 +61,46 @@ void PyARParam_dealloc (PyARParam * self)
 // get image size
 PyObject * PyARParam_getSize (PyARParam * self, void * closure)
 {
-  PyObject * size = PyTuple_New(2);
+  return Py_BuildValue("(ii)", self->param->xsize, self->param->ysize);
+}
 
+// set image size
+int PyARParam_setSize(PyARParam * self, PyObject *value, void *closure)
+{
+  // check new value
+  bool valid = value != NULL && PyTuple_Check(value) && PyTuple_Size(value) == 2;
+  int size[2];
+  if (valid)
+  {
+    // get values from tuple
+    for (size_t i = 0; i < 2; ++i)
+    {
+      PyObject * sizeObj = PyTuple_GetItem(value, i);
+      if (PyLong_Check(sizeObj))
+        size[i] = PyLong_AsLong(sizeObj);
+      else
+        valid = false;
+    }
+  }
+  if (valid)
+  {
+    // store new size values
+    arParamChangeSize(self->param, size[0], size[1], self->param);
+    return 0;
+  }
+  else
+  {
+    // report value error
+    PyErr_SetString(PyExc_TypeError, "Tuple of two integers is required");
+    return -1;
+  }
 }
 
 // load data file to ARParam object
 PyObject * PyARParam_load (PyARParam * self, PyObject * args)
 {
   // get file name
-  const char * fileName;
+  const char * fileName = nullptr;
   if (!PyArg_ParseTuple(args, "s", fileName))
     return Py_False;
 

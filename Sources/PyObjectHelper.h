@@ -52,7 +52,7 @@ template <class PyType> PyObject * getPyObject(PyType * obj)
     Deallocate pointer to type structure.
     \param pointer to type structure
 */ 
-template <class PyType> PyObject * deallocPyObject(PyType * obj)
+template <class PyType> void deallocPyObject(PyType * obj)
 {
   Py_TYPE(obj)->tp_free(getPyObject(obj));
 }
