@@ -36,7 +36,7 @@ static PyMethodDef moduleMethods[] =
 static PyModuleDef ARTKBlenderModule =
 {
   PyModuleDef_HEAD_INIT,
-  "artk",
+  "ARTKBlender",
   "ARTK Python interface providing access to ARToolKit objects for Blender (Game Engine).",
   -1,
   moduleMethods
