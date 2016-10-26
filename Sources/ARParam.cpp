@@ -130,10 +130,10 @@ PyMethodDef PyARParam_methods[] =
 PyTypeObject ARParamType =
 {
   PyVarObject_HEAD_INIT(NULL, 0)
-  "artk.ARParam",            /* tp_name */
-  sizeof(ARParam),           /* tp_basicsize */
+  "ARTKBlender.ARParam",     /* tp_name */
+  sizeof(PyARParam),         /* tp_basicsize */
   0,                         /* tp_itemsize */
-  0,                         /* tp_dealloc */
+  (destructor)PyARParam_dealloc,  /* tp_dealloc */
   0,                         /* tp_print */
   0,                         /* tp_getattr */
   0,                         /* tp_setattr */

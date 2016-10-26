@@ -75,7 +75,7 @@ public:
       Provide list of registration objects.
       \return vector of objects
   */
-  static std::vector<PyTypeRegistration*> & GetTypes()
+  static std::vector<PyTypeRegistration*> * GetTypes()
   {
     return types;
   }
@@ -96,28 +96,27 @@ TEST_CLASS(PyTypeRegistrationTests)
 public:
   TEST_METHOD_CLEANUP(ClearTypes)
   {
-    MockPyTypeRegistration::GetTypes().clear();
+    MockPyTypeRegistration::GetTypes()->clear();
   }
 
   TEST_METHOD(CreateObjects)
   {
-    Assert::IsTrue(MockPyTypeRegistration::GetTypes().empty());
-
     MockPyTypeRegistration pyType1("TypeName1");
 
     Assert::AreEqual(pyType1.GetCallFlags(), short(0));
 
-    Assert::IsFalse(MockPyTypeRegistration::GetTypes().empty());
-    Assert::AreEqual(MockPyTypeRegistration::GetTypes().size(), size_t(1));
-    Assert::IsTrue(MockPyTypeRegistration::GetTypes()[0] == &pyType1);
+    Assert::IsNotNull(MockPyTypeRegistration::GetTypes());
+    Assert::IsFalse(MockPyTypeRegistration::GetTypes()->empty());
+    Assert::AreEqual(MockPyTypeRegistration::GetTypes()->size(), size_t(1));
+    Assert::IsTrue((*MockPyTypeRegistration::GetTypes())[0] == &pyType1);
 
     MockPyTypeRegistration pyType2("TypeName2");
 
     Assert::AreEqual(pyType1.GetCallFlags(), short(0));
 
-    Assert::AreEqual(MockPyTypeRegistration::GetTypes().size(), size_t(2));
-    Assert::IsTrue(MockPyTypeRegistration::GetTypes()[0] == &pyType1);
-    Assert::IsTrue(MockPyTypeRegistration::GetTypes()[1] == &pyType2);
+    Assert::AreEqual(MockPyTypeRegistration::GetTypes()->size(), size_t(2));
+    Assert::IsTrue((*MockPyTypeRegistration::GetTypes())[0] == &pyType1);
+    Assert::IsTrue((*MockPyTypeRegistration::GetTypes())[1] == &pyType2);
   }
 
   TEST_METHOD(Run_GetAllReady)
@@ -215,7 +214,7 @@ public:
 
   TEST_METHOD_CLEANUP(ClearTest)
   {
-    MockPyTypeRegistration::GetTypes().clear();
+    MockPyTypeRegistration::GetTypes()->clear();
     Py_Finalize();
   }
 

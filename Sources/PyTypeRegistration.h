@@ -75,7 +75,7 @@ protected:
 
 
   /// global list of types to be registered in module
-  static std::vector<PyTypeRegistration*> types;
+  static std::vector<PyTypeRegistration*> * types;
 };
 
 }

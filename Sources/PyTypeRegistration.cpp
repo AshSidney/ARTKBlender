@@ -25,20 +25,23 @@ namespace ARTKBlender
 {
 
 // static list of types
-std::vector<PyTypeRegistration*> PyTypeRegistration::types;
+std::vector<PyTypeRegistration*> * PyTypeRegistration::types = nullptr;
 
 
 // constructor
 PyTypeRegistration::PyTypeRegistration (const char * name, PyTypeObject & data)
   : typeName(name), typeData(data)
 {
-  types.push_back(this);
+  // create vector of types if doesn't exist
+  if (types == nullptr)
+    types = new std::vector<PyTypeRegistration*>;
+  // add type to vector
+  types->push_back(this);
 }
 
 // prepare python type for registration
 bool PyTypeRegistration::GetReady ()
 {
-  typeData.tp_new = PyType_GenericNew;
   return PyType_Ready(&typeData) == 0;
 }
 
@@ -52,7 +55,7 @@ void PyTypeRegistration::AddType (PyObject * module)
 // prepare all types
 bool PyTypeRegistration::GetAllReady ()
 {
-  for (auto pType : types)
+  for (auto pType : *types)
     if (!pType->GetReady())
       return false;
   return true;
@@ -61,7 +64,7 @@ bool PyTypeRegistration::GetAllReady ()
 // add all types to module
 void PyTypeRegistration::AddAllTypes (PyObject * module)
 {
-  for (auto pType : types)
+  for (auto pType : *types)
     pType->AddType(module);
 }
 

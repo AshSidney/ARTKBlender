@@ -30,10 +30,18 @@
     <ClCompile Include="UnitTests\ARParamTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTests\PyTestHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="UnitTests\Python\miniTest.py">
+    <None Include="UnitTests\Python\ARParamTest.py">
       <Filter>Python Test Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UnitTests\PyTestHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

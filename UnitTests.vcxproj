@@ -155,10 +155,14 @@
   <ItemGroup>
     <ClCompile Include="Sources\PyTypeRegistration.cpp" />
     <ClCompile Include="UnitTests\ARParamTest.cpp" />
+    <ClCompile Include="UnitTests\PyTestHelper.cpp" />
     <ClCompile Include="UnitTests\PyTypeRegistrationTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="UnitTests\Python\miniTest.py" />
+    <None Include="UnitTests\Python\ARParamTest.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UnitTests\PyTestHelper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

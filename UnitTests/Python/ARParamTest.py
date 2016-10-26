@@ -17,8 +17,9 @@
 # along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-def test1 ():
-  return True
+import ARTKBlender
 
-def test2 ():
-  return False
+def test_ARParam_Size ():
+  param = ARTKBlender.ARParam()
+  param.size = (640, 400)
+  return param.size[0] == 640 and param.size[1] == 400
