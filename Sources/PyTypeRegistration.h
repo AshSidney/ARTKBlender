@@ -22,7 +22,6 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <Python.h>
-#include <vector>
 
 namespace ARTKBlender
 {
@@ -41,41 +40,43 @@ public:
       \param typeName name of python class
       \param typeData description of python class
   */
-  PyTypeRegistration(const char * name, PyTypeObject & data);
+  PyTypeRegistration (const char * name, PyTypeObject & data);
 
   /**
       Function to prepare all registered types.
       \return true, if all type were successfully prepared
   */
-  static bool GetAllReady();
+  static bool getAllReady ();
 
   /**
       Function to add all registered types to module.
       \module module object
   */
-  static void AddAllTypes(PyObject * module);
+  static void addAllTypes (PyObject * module);
 
 protected:
   /// name for python type
   const char * typeName;
   /// data for python type description
   PyTypeObject & typeData;
+  /// the next type object
+  PyTypeRegistration * nextType;
 
   /**
       Method to prepare type.
       \return true, if this type was successfully prepared
   */
-  virtual bool GetReady();
+  virtual bool getReady (void);
 
   /**
       Method to add type to module.
       \module module object
   */
-  virtual void AddType(PyObject * module);
+  virtual void addType (PyObject * module);
 
 
-  /// global list of types to be registered in module
-  static std::vector<PyTypeRegistration*> * types;
+  /// global pointer to list of types to be registered in module
+  static PyTypeRegistration * firstType;
 };
 
 }

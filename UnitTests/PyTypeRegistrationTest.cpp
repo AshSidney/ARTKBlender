@@ -22,6 +22,7 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include "CppUnitTest.h"
 
 #include "PyTypeRegistration.h"
+#include "PyObjectHelper.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -39,7 +40,7 @@ public:
       Constructor for mock object.
       \param name name of python type
   */
-  MockPyTypeRegistration(const char * name, bool ready = true)
+  MockPyTypeRegistration (const char * name, bool ready = true)
     : PyTypeRegistration(name, testPyType), isReady(ready), callFlags(0)
   {}
 
@@ -47,7 +48,7 @@ public:
       Method to prepare type. In mock class is empty.
       \return true, if this type was successfully prepared
   */
-  virtual bool GetReady()
+  virtual bool getReady (void)
   {
     ++callFlags;
     return isReady;
@@ -57,35 +58,44 @@ public:
       Method to add type to module. In mock class is empty.
       \module module object
   */
-  virtual void AddType(PyObject * module)
+  virtual void addType (PyObject * module)
   {
     callFlags += 2;
+  }
+
+  /**
+  Method to get next type in list.
+  \return next type in list or nullptr, if this is the last one
+  */
+  MockPyTypeRegistration * next (void)
+  {
+    return static_cast<MockPyTypeRegistration*>(nextType);
   }
 
   /**
       Provide call flags.
       \return flags value
   */
-  short GetCallFlags()
+  short getCallFlags (void)
   {
     return callFlags;
   }
 
   /**
-      Provide list of registration objects.
-      \return vector of objects
+      Provide the first item in list of registration objects.
+      \return pointer to the first object
   */
-  static std::vector<PyTypeRegistration*> * GetTypes()
+  static PyTypeRegistration *& getFirstType()
   {
-    return types;
+    return firstType;
   }
 
 protected:
   /// testing python type data
   PyTypeObject testPyType;
-  /// flag to be returned by GetReady() method
+  /// flag to be returned by getReady() method
   bool isReady;
-  /// flags indicating GetReady() and AddType() methods were called
+  /// flags indicating getReady() and addType() methods were called
   short callFlags;
 };
 
@@ -96,27 +106,27 @@ TEST_CLASS(PyTypeRegistrationTests)
 public:
   TEST_METHOD_CLEANUP(ClearTypes)
   {
-    MockPyTypeRegistration::GetTypes()->clear();
+      MockPyTypeRegistration::getFirstType() = nullptr;
   }
 
   TEST_METHOD(CreateObjects)
   {
+    Assert::IsNull(MockPyTypeRegistration::getFirstType());
+
     MockPyTypeRegistration pyType1("TypeName1");
 
-    Assert::AreEqual(pyType1.GetCallFlags(), short(0));
+    Assert::AreEqual(pyType1.getCallFlags(), short(0));
 
-    Assert::IsNotNull(MockPyTypeRegistration::GetTypes());
-    Assert::IsFalse(MockPyTypeRegistration::GetTypes()->empty());
-    Assert::AreEqual(MockPyTypeRegistration::GetTypes()->size(), size_t(1));
-    Assert::IsTrue((*MockPyTypeRegistration::GetTypes())[0] == &pyType1);
+    Assert::IsTrue(MockPyTypeRegistration::getFirstType() == &pyType1);
+    Assert::IsNull(pyType1.next());
 
     MockPyTypeRegistration pyType2("TypeName2");
 
-    Assert::AreEqual(pyType1.GetCallFlags(), short(0));
+    Assert::AreEqual(pyType2.getCallFlags(), short(0));
 
-    Assert::AreEqual(MockPyTypeRegistration::GetTypes()->size(), size_t(2));
-    Assert::IsTrue((*MockPyTypeRegistration::GetTypes())[0] == &pyType1);
-    Assert::IsTrue((*MockPyTypeRegistration::GetTypes())[1] == &pyType2);
+    Assert::IsTrue(MockPyTypeRegistration::getFirstType() == &pyType2);
+    Assert::IsTrue(pyType2.next() == &pyType1);
+    Assert::IsNull(pyType1.next());
   }
 
   TEST_METHOD(Run_GetAllReady)
@@ -125,11 +135,11 @@ public:
     MockPyTypeRegistration pyType2("TypeName2");
     MockPyTypeRegistration pyType3("TypeName3");
 
-    Assert::IsTrue(MockPyTypeRegistration::GetAllReady());
+    Assert::IsTrue(MockPyTypeRegistration::getAllReady());
 
-    Assert::AreEqual(pyType1.GetCallFlags(), short(1));
-    Assert::AreEqual(pyType2.GetCallFlags(), short(1));
-    Assert::AreEqual(pyType3.GetCallFlags(), short(1));
+    Assert::AreEqual(pyType1.getCallFlags(), short(1));
+    Assert::AreEqual(pyType2.getCallFlags(), short(1));
+    Assert::AreEqual(pyType3.getCallFlags(), short(1));
   }
 
   TEST_METHOD(Run_GetAllReady_Fail)
@@ -138,11 +148,11 @@ public:
     MockPyTypeRegistration pyType2("TypeName2", false);
     MockPyTypeRegistration pyType3("TypeName3");
 
-    Assert::IsFalse(MockPyTypeRegistration::GetAllReady());
+    Assert::IsFalse(MockPyTypeRegistration::getAllReady());
 
-    Assert::AreEqual(pyType1.GetCallFlags(), short(1));
-    Assert::AreEqual(pyType2.GetCallFlags(), short(1));
-    Assert::AreEqual(pyType3.GetCallFlags(), short(0));
+    Assert::AreEqual(pyType1.getCallFlags(), short(0));
+    Assert::AreEqual(pyType2.getCallFlags(), short(1));
+    Assert::AreEqual(pyType3.getCallFlags(), short(1));
   }
 
   TEST_METHOD(Run_AddType)
@@ -151,12 +161,14 @@ public:
     MockPyTypeRegistration pyType2("TypeName2");
     MockPyTypeRegistration pyType3("TypeName3");
 
-    Assert::IsTrue(MockPyTypeRegistration::GetAllReady());
-    MockPyTypeRegistration::AddAllTypes(nullptr);
+    Assert::IsTrue(MockPyTypeRegistration::getAllReady());
+    MockPyTypeRegistration::addAllTypes(nullptr);
 
-    Assert::AreEqual(pyType1.GetCallFlags(), short(3));
-    Assert::AreEqual(pyType2.GetCallFlags(), short(3));
-    Assert::AreEqual(pyType3.GetCallFlags(), short(3));
+    Assert::AreEqual(pyType1.getCallFlags(), short(3));
+    Assert::AreEqual(pyType2.getCallFlags(), short(3));
+    Assert::AreEqual(pyType3.getCallFlags(), short(3));
+
+    Assert::IsNull(MockPyTypeRegistration::getFirstType());
   }
 };
 
@@ -214,7 +226,6 @@ public:
 
   TEST_METHOD_CLEANUP(ClearTest)
   {
-    MockPyTypeRegistration::GetTypes()->clear();
     Py_Finalize();
   }
 
@@ -222,14 +233,14 @@ public:
   {
     ARTKBlender::PyTypeRegistration pyType("TestPyType", TestPythonType);
 
-    Assert::IsTrue(ARTKBlender::PyTypeRegistration::GetAllReady());
+    Assert::IsTrue(ARTKBlender::PyTypeRegistration::getAllReady());
 
     PyObject * testMod = PyModule_Create(&TestPyModule);
 
-    ARTKBlender::PyTypeRegistration::AddAllTypes(testMod);
+    ARTKBlender::PyTypeRegistration::addAllTypes(testMod);
 
-    PyObject * modDict = PyModule_GetDict(testMod);
-    PyObject * modType = PyDict_GetItemString(modDict, "TestPyType");
+    ARTKBlender::PyObjectOwner modDict (PyModule_GetDict(testMod));
+    PyObject * modType = PyDict_GetItemString(modDict.get(), "TestPyType");
 
     Assert::IsTrue(PyType_CheckExact(modType));
   }

@@ -57,7 +57,7 @@ public:
       \param testPrefix prefix of functions to run
       \return vector of error texts
   */
-  std::vector<std::wstring> RunTests (const std::string & fileName, const wchar_t testPrefix[] = L"test_");
+  std::vector<std::wstring> RunTests (const std::string & fileName, const char testPrefix[] = "test_");
 };
 
 /**
@@ -73,5 +73,5 @@ void AssertPythonFunction (const std::string & fileName, const std::string & tes
     \param fileName   name of test file (without .py extension)
     \param testPrefix prefix of functions to run
 */
-void AssertPythonModule (const std::string & fileName, const wchar_t testPrefix[] = L"test_");
+void AssertPythonModule (const std::string & fileName, const char testPrefix[] = "test_");
 }

@@ -25,47 +25,47 @@ namespace ARTKBlender
 {
 
 // static list of types
-std::vector<PyTypeRegistration*> * PyTypeRegistration::types = nullptr;
+PyTypeRegistration * PyTypeRegistration::firstType = nullptr;
 
 
 // constructor
 PyTypeRegistration::PyTypeRegistration (const char * name, PyTypeObject & data)
-  : typeName(name), typeData(data)
+  : typeName(name), typeData(data), nextType(firstType)
 {
-  // create vector of types if doesn't exist
-  if (types == nullptr)
-    types = new std::vector<PyTypeRegistration*>;
-  // add type to vector
-  types->push_back(this);
+  // store type as first
+  firstType = this;
 }
 
 // prepare python type for registration
-bool PyTypeRegistration::GetReady ()
+bool PyTypeRegistration::getReady (void)
 {
   return PyType_Ready(&typeData) == 0;
 }
 
 // add python type to module
-void PyTypeRegistration::AddType (PyObject * module)
+void PyTypeRegistration::addType (PyObject * module)
 {
   Py_INCREF(&typeData);
   PyModule_AddObject(module, typeName, (PyObject *)&typeData);
 }
 
+//
+
 // prepare all types
-bool PyTypeRegistration::GetAllReady ()
+bool PyTypeRegistration::getAllReady (void)
 {
-  for (auto pType : *types)
-    if (!pType->GetReady())
+  for (auto currType = firstType; currType != nullptr; currType = currType->nextType)
+    if (!currType->getReady())
       return false;
   return true;
 }
 
 // add all types to module
-void PyTypeRegistration::AddAllTypes (PyObject * module)
+void PyTypeRegistration::addAllTypes (PyObject * module)
 {
-  for (auto pType : *types)
-    pType->AddType(module);
+  for (auto currType = firstType; currType != nullptr; currType = currType->nextType)
+    currType->addType(module);
+  firstType = nullptr;
 }
 
 }

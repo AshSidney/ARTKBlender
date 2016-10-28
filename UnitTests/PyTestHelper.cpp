@@ -70,11 +70,11 @@ static PyObject * importModuleDict(const std::string & fileName, std::wstring & 
 }
 
 // call python function
-static std::wstring callPythonFunction(PyObject * modDict, PyObject * funcName, PyObject * args = nullptr)
+static std::wstring callPythonFunction(PyObject * modDict, const std::string & testName, PyObject * args = nullptr)
 {
   std::wostringstream error;
   // get function object
-  PyObject * func = PyDict_GetItem(modDict, funcName);
+  PyObject * func = PyDict_GetItemString(modDict, testName.c_str());
   if (func != nullptr && PyCallable_Check(func))
   {
     // call function
@@ -84,18 +84,19 @@ static std::wstring callPythonFunction(PyObject * modDict, PyObject * funcName, 
       // return if success
       return error.str();
     // otherwise prepare error message
+    error << testName.c_str();
     PyObjectOwner excDesc[3];
     PyErr_Fetch(&excDesc[0].get(), &excDesc[1].get(), &excDesc[2].get());
     for (auto & exc : excDesc)
       if (!exc.isNull())
       {
         PyObjectOwner excStr(PyObject_Str(exc.get()));
-        error << PyUnicode_AsUnicode(excStr.get()) << ": ";
+        error << " : " << PyUnicode_AsUnicode(excStr.get());
       }
   }
   else
     // report function not found
-    error << "function: " << PyUnicode_AsUnicode(funcName) << " not found";
+    error << "function: " << testName.c_str() << " not found";
   // return error message
   return error.str();
 }
@@ -108,18 +109,16 @@ std::wstring PyTestHelper::RunTest (const std::string & fileName, const std::str
   PyObjectOwner modDict (importModuleDict(fileName, error));
   if (modDict.isNull())
     return error;
-  // get function name object
-  PyObjectOwner testNameObj(PyUnicode_FromString(testName.c_str()));
   // get function result
-  return callPythonFunction(modDict.get(), testNameObj.get(), args);
+  return callPythonFunction(modDict.get(), testName, args);
 }
 
 
 // run tests from python file
-std::vector<std::wstring> PyTestHelper::RunTests (const std::string & fileName, const wchar_t testPrefix[])
+std::vector<std::wstring> PyTestHelper::RunTests (const std::string & fileName, const char testPrefix[])
 {
   // test functions' prefix size
-  const size_t testPrefixLen = wcslen(testPrefix);
+  const size_t testPrefixLen = strlen(testPrefix);
   
   // resulting list of error messages
   std::vector<std::wstring> result;
@@ -140,12 +139,12 @@ std::vector<std::wstring> PyTestHelper::RunTests (const std::string & fileName, 
     if (PyUnicode_Check(key))
     {
       // check name of object for test prefix
-      std::wstring keyStr (PyUnicode_AsWideCharString(key, NULL));
+      std::string keyStr (PyUnicode_AsUTF8(key));
       // if prefix matches
       if (keyStr.compare(0, testPrefixLen, testPrefix) == 0)
       {
         // get function result
-        std::wstring error = callPythonFunction(modDict.get(), key, nullptr);
+        std::wstring error = callPythonFunction(modDict.get(), keyStr, nullptr);
         if (!error.empty())
           result.push_back(error);
       }
@@ -165,7 +164,7 @@ void AssertPythonFunction(const std::string & fileName, const std::string & test
 }
 
 // run all test functions from module, test assert when any of them failed
-void AssertPythonModule(const std::string & fileName, const wchar_t testPrefix[])
+void AssertPythonModule(const std::string & fileName, const char testPrefix[])
 {
   PyTestHelper pyTest;
   auto rslt = pyTest.RunTests(fileName, testPrefix);

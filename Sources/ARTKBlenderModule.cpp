@@ -47,7 +47,7 @@ static PyModuleDef ARTKBlenderModule =
 PyMODINIT_FUNC PyInit_ARTKBlender (void)
 {
   // prepare classes
-  if (!PyTypeRegistration::GetAllReady())
+  if (!PyTypeRegistration::getAllReady())
     return NULL;
 
   // create module
@@ -56,7 +56,7 @@ PyMODINIT_FUNC PyInit_ARTKBlender (void)
     return NULL;
 
   // add types to module
-  PyTypeRegistration::AddAllTypes(module);
+  PyTypeRegistration::addAllTypes(module);
 
   return module;
 }
