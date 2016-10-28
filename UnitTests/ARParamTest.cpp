@@ -29,16 +29,14 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace UnitTests
 {
 
-// test class for PyTypeRegistration using Python
+// test class for PyARParam type using Python
 TEST_CLASS(PyARParamPythonTests)
 {
 public:
 
   TEST_METHOD(PythonTest)
   {
-    PyTestHelper pyTest;
-    auto rslt = pyTest.RunTests("ARParamTest");
-    Assert::AreEqual(rslt.size(), size_t(0));
+    AssertPythonModule("ARParamTest");
   }
 };
 

@@ -57,4 +57,52 @@ template <class PyType> void deallocPyObject(PyType * obj)
   Py_TYPE(obj)->tp_free(getPyObject(obj));
 }
 
+
+/**
+    Class to hold ownership of python object and release it when destructed.
+*/
+class PyObjectOwner
+{
+public:
+  /**
+      Constructor is initialized by pointer to python object.
+      \param obj    python object
+      \param incRef increase reference count of python object
+  */
+  PyObjectOwner (PyObject * obj = nullptr, bool incRef = false) : pyObject(obj)
+  {
+    if (incRef)
+      Py_INCREF(pyObject);
+  }
+
+  /**
+      Destructor releases python object.
+  */
+  ~PyObjectOwner (void)
+  {
+    if (pyObject != nullptr)
+      Py_DECREF(pyObject);
+  }
+
+  /**
+      Provide access to python object.
+  */
+  PyObject *& get (void)
+  {
+    return pyObject;
+  }
+
+  /**
+     Checks if python object is available.
+  */
+  bool isNull (void)
+  {
+    return pyObject == nullptr;
+  }
+
+protected:
+  /// owned python object
+  PyObject * pyObject;
+};
+
 }

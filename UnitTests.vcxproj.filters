@@ -19,6 +19,9 @@
     <Filter Include="Python Test Files">
       <UniqueIdentifier>{1a97af60-0837-437f-b752-7418086f2d47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data Files">
+      <UniqueIdentifier>{48db65a8-a8ef-4acc-9673-51241799ef31}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="UnitTests\PyTypeRegistrationTest.cpp">
@@ -37,6 +40,9 @@
   <ItemGroup>
     <None Include="UnitTests\Python\ARParamTest.py">
       <Filter>Python Test Files</Filter>
+    </None>
+    <None Include="UnitTests\Data\camera_para.dat">
+      <Filter>Data Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

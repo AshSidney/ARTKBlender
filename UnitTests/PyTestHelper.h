@@ -15,6 +15,7 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 -----------------------------------------------------------------------------
 */
 
+#include <Python.h>
 #include <vector>
 #include <string>
 
@@ -25,9 +26,8 @@ namespace UnitTests
 /**
     Class for running tests from Python files.
     Object of this class loads python file as module and runs every function
-    with prefix "test". These functions must have no parameters and must return
-    boolean value. If return is true, test succeded. Otherwise error message
-    is returned.
+    with prefix "test". These functions must return boolean value.
+    If true is returned, test succeded. Otherwise error message is returned.
 */
 class PyTestHelper
 {
@@ -43,11 +43,35 @@ public:
   ~PyTestHelper ();
 
   /**
-      Method to run python scrpts from file.
+      Method to run one python function from file.
       \param fileName name of test file (without .py extension)
+      \param testName name of test function
+      \param args     arguments for test function
+      \return error text, if empty, test succeded
+  */
+  std::wstring RunTest (const std::string & fileName, const std::string & testName, PyObject * args = nullptr);
+
+  /**
+      Method to run python scripts from file. Runned functions shouldn't have parameters
+      \param fileName   name of test file (without .py extension)
+      \param testPrefix prefix of functions to run
       \return vector of error texts
   */
-  std::vector<std::wstring> RunTests (const std::string & fileName);
+  std::vector<std::wstring> RunTests (const std::string & fileName, const wchar_t testPrefix[] = L"test_");
 };
 
+/**
+    Method to run python scripts from file. Runned functions shouldn't have parameters
+    \param fileName name of test file (without .py extension)
+    \param testName name of test function
+    \param args     arguments for test function
+*/
+void AssertPythonFunction (const std::string & fileName, const std::string & testName, PyObject * args = nullptr);
+
+/**
+    Method to run python scripts from file. Runned functions shouldn't have parameters
+    \param fileName   name of test file (without .py extension)
+    \param testPrefix prefix of functions to run
+*/
+void AssertPythonModule (const std::string & fileName, const wchar_t testPrefix[] = L"test_");
 }

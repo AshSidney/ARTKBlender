@@ -18,12 +18,16 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include "PyTestHelper.h"
 
 #include <Python.h>
-
 #include <sstream>
+#include "CppUnitTest.h"
+
+#include "PyObjectHelper.h"
 
 
 namespace UnitTests
 {
+
+using namespace ARTKBlender;
 
 // implementation of PyTestHelper methods
 
@@ -48,56 +52,127 @@ PyTestHelper::~PyTestHelper ()
   Py_Finalize();
 }
 
-// run tests from python file
-std::vector<std::wstring> PyTestHelper::RunTests (const std::string & fileName)
+// import module and return its dictionary
+static PyObject * importModuleDict(const std::string & fileName, std::wstring & error)
 {
-  // test functions' prefix
-  const wchar_t testPrefix[] = L"test_";
+  // try to import module
+  PyObjectOwner module (PyImport_ImportModule(fileName.c_str()));
+  if (module.isNull())
+  {
+    // if failed, report error
+    std::wstringstream errStr;
+    errStr << fileName.c_str() << ": module not found";
+    error = errStr.str();
+    return nullptr;
+  }
+  // get module's dictionary
+  return PyModule_GetDict(module.get());
+}
+
+// call python function
+static std::wstring callPythonFunction(PyObject * modDict, PyObject * funcName, PyObject * args = nullptr)
+{
+  std::wostringstream error;
+  // get function object
+  PyObject * func = PyDict_GetItem(modDict, funcName);
+  if (func != nullptr && PyCallable_Check(func))
+  {
+    // call function
+    PyObjectOwner rslt(PyObject_CallObject(func, args));
+    // check result of function
+    if (!rslt.isNull() && PyObject_IsTrue(rslt.get()) != 0)
+      // return if success
+      return error.str();
+    // otherwise prepare error message
+    PyObjectOwner excDesc[3];
+    PyErr_Fetch(&excDesc[0].get(), &excDesc[1].get(), &excDesc[2].get());
+    for (auto & exc : excDesc)
+      if (!exc.isNull())
+      {
+        PyObjectOwner excStr(PyObject_Str(exc.get()));
+        error << PyUnicode_AsUnicode(excStr.get()) << ": ";
+      }
+  }
+  else
+    // report function not found
+    error << "function: " << PyUnicode_AsUnicode(funcName) << " not found";
+  // return error message
+  return error.str();
+}
+
+// run one test from python file
+std::wstring PyTestHelper::RunTest (const std::string & fileName, const std::string & testName, PyObject * args)
+{
+  std::wstring error;
+  // get module dictionary
+  PyObjectOwner modDict (importModuleDict(fileName, error));
+  if (modDict.isNull())
+    return error;
+  // get function name object
+  PyObjectOwner testNameObj(PyUnicode_FromString(testName.c_str()));
+  // get function result
+  return callPythonFunction(modDict.get(), testNameObj.get(), args);
+}
+
+
+// run tests from python file
+std::vector<std::wstring> PyTestHelper::RunTests (const std::string & fileName, const wchar_t testPrefix[])
+{
+  // test functions' prefix size
   const size_t testPrefixLen = wcslen(testPrefix);
   
   // resulting list of error messages
   std::vector<std::wstring> result;
 
-  // try to import module
-  PyObject * module = PyImport_ImportModule(fileName.c_str());
-  if (module == nullptr)
+  // get module dictionary
+  std::wstring error;
+  PyObjectOwner modDict(importModuleDict(fileName, error));
+  if (modDict.isNull())
   {
-    // if failed, report error
-    std::wstringstream errStr;
-    errStr << fileName.c_str() << ": module not found";
-    result.push_back(errStr.str());
+    result.push_back(error);
     return result;
   }
-  // get module's dictionary
-  PyObject * modDict = PyModule_GetDict(module);
-  PyObject * keys = PyDict_Keys(modDict);
+  // get module object names
+  PyObject * keys = PyDict_Keys(modDict.get());
   for (int i = 0; i < PyList_Size(keys); ++i)
   {
     PyObject * key = PyList_GetItem(keys, i);
     if (PyUnicode_Check(key))
     {
-      // check name of module object
+      // check name of object for test prefix
       std::wstring keyStr (PyUnicode_AsWideCharString(key, NULL));
       // if prefix matches
       if (keyStr.compare(0, testPrefixLen, testPrefix) == 0)
       {
-        // get function object
-        PyObject * func = PyDict_GetItem(modDict, key);
-        if (PyCallable_Check(func))
-        {
-          // call function
-          PyObject * rslt = PyObject_CallObject(func, NULL);
-          // get result of function
-          bool failed = PyObject_IsTrue(rslt) == 0;
-          // if failed, add function name to results
-          if (failed)
-            result.push_back(keyStr);
-        }
+        // get function result
+        std::wstring error = callPythonFunction(modDict.get(), key, nullptr);
+        if (!error.empty())
+          result.push_back(error);
       }
     }
   }
   // return error messages
   return result;
+}
+
+
+// run python function, test assert when failed
+void AssertPythonFunction(const std::string & fileName, const std::string & testName, PyObject * args)
+{
+  PyTestHelper pyTest;
+  auto rslt = pyTest.RunTest(fileName, testName, args);
+  Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(rslt.empty(), rslt.c_str());
+}
+
+// run all test functions from module, test assert when any of them failed
+void AssertPythonModule(const std::string & fileName, const wchar_t testPrefix[])
+{
+  PyTestHelper pyTest;
+  auto rslt = pyTest.RunTests(fileName, testPrefix);
+  std::wostringstream errors;
+  for (auto errStr : rslt)
+    errors << errStr.c_str() << std::endl;
+  Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(rslt.empty(), errors.str().c_str());
 }
 
 }
