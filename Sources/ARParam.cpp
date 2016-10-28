@@ -96,12 +96,30 @@ int PyARParam_setSize(PyARParam * self, PyObject *value, void *closure)
   }
 }
 
+// get matrix
+PyObject * PyARParam_getMatrix(PyARParam * self, void * closure)
+{
+  return Py_BuildValue("((dddd)(dddd)(dddd))",
+    self->param->mat[0][0], self->param->mat[0][1], self->param->mat[0][2], self->param->mat[0][3],
+    self->param->mat[1][0], self->param->mat[1][1], self->param->mat[1][2], self->param->mat[1][3],
+    self->param->mat[2][0], self->param->mat[2][1], self->param->mat[2][2], self->param->mat[2][3]);
+}
+
+// get matrix
+PyObject * PyARParam_getDistFactor(PyARParam * self, void * closure)
+{
+  return Py_BuildValue("(ddddddddd)",
+    self->param->dist_factor[0], self->param->dist_factor[1], self->param->dist_factor[2],
+    self->param->dist_factor[3], self->param->dist_factor[4], self->param->dist_factor[5],
+    self->param->dist_factor[6], self->param->dist_factor[7], self->param->dist_factor[8]);
+}
+
 // load data file to ARParam object
 PyObject * PyARParam_load (PyARParam * self, PyObject * args)
 {
   // get file name
   const char * fileName = nullptr;
-  if (!PyArg_ParseTuple(args, "s", fileName))
+  if (!PyArg_ParseTuple(args, "s", &fileName))
     return Py_False;
 
   // load data from file
@@ -114,7 +132,11 @@ PyGetSetDef PyARParam_getseters[] =
 {
   { "size", (getter)PyARParam_getSize, (setter)PyARParam_setSize,
     "image size", NULL },
-  { NULL }  /* Sentinel */
+  { "matrix", (getter)PyARParam_getMatrix, NULL,
+    "projection matrix", NULL },
+  { "distFactor", (getter)PyARParam_getDistFactor, NULL,
+    "distorsion parameters", NULL },
+    { NULL }  /* Sentinel */
 };
 
 /// methods descriptions

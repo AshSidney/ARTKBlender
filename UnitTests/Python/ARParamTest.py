@@ -23,3 +23,18 @@ def test_ARParam_Size ():
   param = ARTKBlender.ARParam()
   param.size = (640, 400)
   return param.size[0] == 640 and param.size[1] == 400
+
+def testARParamLoadData (dataFile, imgSize, matrix, distFac):
+  param = ARTKBlender.ARParam()
+  if not param.load(dataFile):
+    return False
+  if param.size[0] != imgSize[0] or param.size[1] != imgSize[1]:
+    return False
+  for i in range(3):
+    for j in range(4):
+      if param.matrix[i][j] != matrix[i][j]:
+        return False
+  for i in range(len(distFac)):
+    if param.distFactor[i] != distFac[i]:
+      return False
+  return True

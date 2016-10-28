@@ -41,27 +41,31 @@ public:
       Constructor ends python interpret.
   */
   ~PyTestHelper ();
-
-  /**
-      Method to run one python function from file.
-      \param fileName name of test file (without .py extension)
-      \param testName name of test function
-      \param args     arguments for test function
-      \return error text, if empty, test succeded
-  */
-  std::wstring runTest (const std::string & fileName, const std::string & testName, PyObject * args = nullptr);
-
-  /**
-      Method to run python scripts from file. Runned functions shouldn't have parameters
-      \param fileName   name of test file (without .py extension)
-      \param testPrefix prefix of functions to run
-      \return vector of error texts
-  */
-  std::vector<std::wstring> runTests (const std::string & fileName, const char testPrefix[] = "test_");
 };
 
+
+/// global helper object
+extern PyTestHelper pyTestHelper;
+
 /**
-    Method to run python scripts from file. Runned functions shouldn't have parameters
+    Function to run one python function from file.
+    \param fileName name of test file (without .py extension)
+    \param testName name of test function
+    \param args     arguments for test function
+    \return error text, if empty, test succeded
+*/
+std::wstring runTest (const std::string & fileName, const std::string & testName, PyObject * args = nullptr);
+
+/**
+    Function to run python scripts from file. Runned functions shouldn't have parameters.
+    \param fileName   name of test file (without .py extension)
+    \param testPrefix prefix of functions to run
+    \return vector of error texts
+*/
+std::vector<std::wstring> runTests (const std::string & fileName, const char testPrefix[] = "test_");
+
+/**
+    Function to run one python function from file and check its result.
     \param fileName name of test file (without .py extension)
     \param testName name of test function
     \param args     arguments for test function
@@ -69,9 +73,10 @@ public:
 void AssertPythonFunction (const std::string & fileName, const std::string & testName, PyObject * args = nullptr);
 
 /**
-    Method to run python scripts from file. Runned functions shouldn't have parameters
+    Function to run python scripts from file and check their results. Runned functions shouldn't have parameters.
     \param fileName   name of test file (without .py extension)
     \param testPrefix prefix of functions to run
 */
 void AssertPythonModule (const std::string & fileName, const char testPrefix[] = "test_");
+
 }

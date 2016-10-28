@@ -29,6 +29,10 @@ namespace UnitTests
 
 using namespace ARTKBlender;
 
+// global helper object
+PyTestHelper pyTestHelper;
+
+
 // implementation of PyTestHelper methods
 
 // constructor
@@ -102,7 +106,7 @@ static std::wstring callPythonFunction(PyObject * modDict, const std::string & t
 }
 
 // run one test from python file
-std::wstring PyTestHelper::runTest (const std::string & fileName, const std::string & testName, PyObject * args)
+std::wstring runTest (const std::string & fileName, const std::string & testName, PyObject * args)
 {
   std::wstring error;
   // get module dictionary
@@ -115,7 +119,7 @@ std::wstring PyTestHelper::runTest (const std::string & fileName, const std::str
 
 
 // run tests from python file
-std::vector<std::wstring> PyTestHelper::runTests (const std::string & fileName, const char testPrefix[])
+std::vector<std::wstring> runTests (const std::string & fileName, const char testPrefix[])
 {
   // test functions' prefix size
   const size_t testPrefixLen = strlen(testPrefix);
@@ -158,16 +162,15 @@ std::vector<std::wstring> PyTestHelper::runTests (const std::string & fileName, 
 // run python function, test assert when failed
 void AssertPythonFunction(const std::string & fileName, const std::string & testName, PyObject * args)
 {
-  PyTestHelper pyTest;
-  auto rslt = pyTest.runTest(fileName, testName, args);
+  auto rslt = runTest(fileName, testName, args);
   Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(rslt.empty(), rslt.c_str());
 }
+
 
 // run all test functions from module, test assert when any of them failed
 void AssertPythonModule(const std::string & fileName, const char testPrefix[])
 {
-  PyTestHelper pyTest;
-  auto rslt = pyTest.runTests(fileName, testPrefix);
+  auto rslt = runTests(fileName, testPrefix);
   std::wostringstream errors;
   for (auto errStr : rslt)
     errors << errStr.c_str() << std::endl;
