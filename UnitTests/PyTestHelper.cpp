@@ -102,7 +102,7 @@ static std::wstring callPythonFunction(PyObject * modDict, const std::string & t
 }
 
 // run one test from python file
-std::wstring PyTestHelper::RunTest (const std::string & fileName, const std::string & testName, PyObject * args)
+std::wstring PyTestHelper::runTest (const std::string & fileName, const std::string & testName, PyObject * args)
 {
   std::wstring error;
   // get module dictionary
@@ -115,7 +115,7 @@ std::wstring PyTestHelper::RunTest (const std::string & fileName, const std::str
 
 
 // run tests from python file
-std::vector<std::wstring> PyTestHelper::RunTests (const std::string & fileName, const char testPrefix[])
+std::vector<std::wstring> PyTestHelper::runTests (const std::string & fileName, const char testPrefix[])
 {
   // test functions' prefix size
   const size_t testPrefixLen = strlen(testPrefix);
@@ -159,7 +159,7 @@ std::vector<std::wstring> PyTestHelper::RunTests (const std::string & fileName, 
 void AssertPythonFunction(const std::string & fileName, const std::string & testName, PyObject * args)
 {
   PyTestHelper pyTest;
-  auto rslt = pyTest.RunTest(fileName, testName, args);
+  auto rslt = pyTest.runTest(fileName, testName, args);
   Microsoft::VisualStudio::CppUnitTestFramework::Assert::IsTrue(rslt.empty(), rslt.c_str());
 }
 
@@ -167,7 +167,7 @@ void AssertPythonFunction(const std::string & fileName, const std::string & test
 void AssertPythonModule(const std::string & fileName, const char testPrefix[])
 {
   PyTestHelper pyTest;
-  auto rslt = pyTest.RunTests(fileName, testPrefix);
+  auto rslt = pyTest.runTests(fileName, testPrefix);
   std::wostringstream errors;
   for (auto errStr : rslt)
     errors << errStr.c_str() << std::endl;

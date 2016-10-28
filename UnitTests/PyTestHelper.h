@@ -49,7 +49,7 @@ public:
       \param args     arguments for test function
       \return error text, if empty, test succeded
   */
-  std::wstring RunTest (const std::string & fileName, const std::string & testName, PyObject * args = nullptr);
+  std::wstring runTest (const std::string & fileName, const std::string & testName, PyObject * args = nullptr);
 
   /**
       Method to run python scripts from file. Runned functions shouldn't have parameters
@@ -57,7 +57,7 @@ public:
       \param testPrefix prefix of functions to run
       \return vector of error texts
   */
-  std::vector<std::wstring> RunTests (const std::string & fileName, const char testPrefix[] = "test_");
+  std::vector<std::wstring> runTests (const std::string & fileName, const char testPrefix[] = "test_");
 };
 
 /**
