@@ -21,6 +21,8 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PyTypeRegistration.h"
 
+#include "PyObjectHelper.h"
+
 namespace ARTKBlender
 {
 
@@ -66,6 +68,35 @@ void PyTypeRegistration::addAllTypes (PyObject * module)
   for (auto currType = firstType; currType != nullptr; currType = currType->nextType)
     currType->addType(module);
   firstType = nullptr;
+}
+
+
+// implementation of enumeration type registration
+
+// constructor
+PyTypeRegistrationEnum::PyTypeRegistrationEnum (const char * name, PyTypeObject & data, EnumMap & enumVals)
+  : PyTypeRegistration(name, data), enumValues(enumVals)
+{}
+
+// preparing python type
+bool PyTypeRegistrationEnum::getReady(void)
+{
+  // prepare type
+  if (!PyTypeRegistration::getReady())
+    return false;
+  // add enumeration to dictionary
+  for (auto & item : enumValues)
+  {
+    // check if key is already in dictionary
+    PyObjectOwner key(PyUnicode_FromString(item.first.c_str()));
+    if (PyDict_Contains(typeData.tp_dict, key.get()) != 0)
+      return false;
+    // add item to dictionary
+    PyObjectOwner value(PyLong_FromLong(item.second));
+    if (PyDict_SetItem(typeData.tp_dict, key.get(), value.get()) != 0)
+      return false;
+  }
+  return true;
 }
 
 }

@@ -56,8 +56,13 @@ int PyARHandle_init(PyARHandle * self, PyObject *args, PyObject *kwds)
 {
   // parse parameter
   PyObject *param = NULL;
-  static char *kwlist[] = { "param", NULL };
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!", kwlist, &ARParamType, &param))
+  int pixFmt = -1;
+  static char *kwlist[] = { "param", "pixelFormat", NULL };
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i", kwlist, &ARParamType, &param, &pixFmt))
+    return -1;
+
+  // check pixel format
+  if (pixFmt < AR_PIXEL_FORMAT_INVALID || pixFmt > AR_PIXEL_FORMAT_MAX)
     return -1;
 
   // create lookup table
@@ -70,20 +75,26 @@ int PyARHandle_init(PyARHandle * self, PyObject *args, PyObject *kwds)
   if (self->handle == nullptr)
     return -1;
 
+  // set pixel format
+  if (arSetPixelFormat(self->handle, AR_PIXEL_FORMAT(pixFmt)) < 0)
+    return -1;
+
   return 0;
 }
 
 
+// get pixel format
+PyObject * PyARHandle_getPixelFormat(PyARHandle * self, void * closure)
+{
+  return Py_BuildValue("i", self->handle->arPixelFormat);
+}
+
 
 // members descriptions
-PyGetSetDef PyARhandle_getseters[] =
+PyGetSetDef PyARHandle_getseters[] =
 {
-  /*{ "size", (getter)PyARParam_getSize, (setter)PyARParam_setSize,
-  "image size", NULL },
-  { "matrix", (getter)PyARParam_getMatrix, NULL,
-  "projection matrix", NULL },
-  { "distFactor", (getter)PyARParam_getDistFactor, NULL,
-  "distorsion parameters", NULL },*/
+  { "pixelFormat", (getter)PyARHandle_getPixelFormat, NULL,
+  "pixel format", NULL },
   { NULL }  /* Sentinel */
 };
 
@@ -128,7 +139,7 @@ PyTypeObject ARHandleType =
   0,                         /* tp_iternext */
   0, //PyARHandle_methods,        /* tp_methods */
   0,                         /* tp_members */
-  0, //PyARHandle_getseters,      /* tp_getset */
+  PyARHandle_getseters,      /* tp_getset */
   0,                         /* tp_base */
   0,                         /* tp_dict */
   0,                         /* tp_descr_get */

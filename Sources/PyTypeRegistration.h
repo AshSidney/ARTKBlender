@@ -22,6 +22,8 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <Python.h>
+#include <string>
+#include <unordered_map>
 
 namespace ARTKBlender
 {
@@ -77,6 +79,35 @@ protected:
 
   /// global pointer to list of types to be registered in module
   static PyTypeRegistration * firstType;
+};
+
+
+/**
+    Specialized subclass for Python enumeration types registration in module.
+*/
+class PyTypeRegistrationEnum : public PyTypeRegistration
+{
+public:
+  /// enumeration values map type
+  typedef std::unordered_map<std::string, int> EnumMap;
+
+  /**
+      Constructor
+      \param typeName name of python class
+      \param typeData description of python class
+      \param enumVals map defining enumeration values
+  */
+  PyTypeRegistrationEnum (const char * name, PyTypeObject & data, EnumMap & enumVals);
+
+protected:
+  /// enumeration values
+  EnumMap enumValues;
+
+  /**
+  Method to prepare type.
+  \return true, if this type was successfully prepared
+  */
+  virtual bool getReady (void);
 };
 
 }

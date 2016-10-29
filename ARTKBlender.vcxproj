@@ -168,12 +168,14 @@
   <ItemGroup>
     <ClCompile Include="Sources\ARHandle.cpp" />
     <ClCompile Include="Sources\ARParam.cpp" />
+    <ClCompile Include="Sources\ARPixelFormat.cpp" />
     <ClCompile Include="Sources\ARTKBlenderModule.cpp" />
     <ClCompile Include="Sources\PyTypeRegistration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\ARHandle.h" />
     <ClInclude Include="Sources\ARParam.h" />
+    <ClInclude Include="Sources\ARPixelFormat.h" />
     <ClInclude Include="Sources\PyObjectHelper.h" />
     <ClInclude Include="Sources\PyTypeRegistration.h" />
   </ItemGroup>

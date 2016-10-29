@@ -27,17 +27,13 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 namespace ARTKBlender
 {
 
-/// python data structure for ARHandle
-struct PyARHandle
+/// python data structure for pixel format
+struct PyARPixelFormat
 {
   PyObject_HEAD
-  /// ARHandle structure
-  ARHandle * handle;
-  /// lookup table from ARParam
-  ARParamLT * paramLT;
 };
 
 // declaration of python module type
-extern PyTypeObject ARHandleType;
+extern PyTypeObject ARPixelFormatType;
 
 }
