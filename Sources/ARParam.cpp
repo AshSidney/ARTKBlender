@@ -19,23 +19,13 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 -----------------------------------------------------------------------------
 */
 
-#include <AR/ar.h>
-#include <Python.h>
+#include "ARParam.h"
 
 #include "PyObjectHelper.h"
 #include "PyTypeRegistration.h"
 
 namespace ARTKBlender
 {
-
-/// python data structure for ARParam
-struct PyARParam
-{
-  PyObject_HEAD
-  /// ARParam structure
-  ARParam * param;
-};
-
 
 /// ARParam object allocation
 PyObject * PyARParam_new (PyTypeObject *type, PyObject *args, PyObject *kwds)

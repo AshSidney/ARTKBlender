@@ -110,11 +110,11 @@ std::wstring runTest (const std::string & fileName, const std::string & testName
 {
   std::wstring error;
   // get module dictionary
-  PyObjectOwner modDict (importModuleDict(fileName, error));
-  if (modDict.isNull())
+  PyObject * modDict = importModuleDict(fileName, error);
+  if (modDict == nullptr)
     return error;
   // get function result
-  return callPythonFunction(modDict.get(), testName, args);
+  return callPythonFunction(modDict, testName, args);
 }
 
 
@@ -129,14 +129,14 @@ std::vector<std::wstring> runTests (const std::string & fileName, const char tes
 
   // get module dictionary
   std::wstring error;
-  PyObjectOwner modDict(importModuleDict(fileName, error));
-  if (modDict.isNull())
+  PyObject * modDict = importModuleDict(fileName, error);
+  if (modDict == nullptr)
   {
     result.push_back(error);
     return result;
   }
   // get module object names
-  PyObject * keys = PyDict_Keys(modDict.get());
+  PyObject * keys = PyDict_Keys(modDict);
   for (int i = 0; i < PyList_Size(keys); ++i)
   {
     PyObject * key = PyList_GetItem(keys, i);
@@ -148,7 +148,7 @@ std::vector<std::wstring> runTests (const std::string & fileName, const char tes
       if (keyStr.compare(0, testPrefixLen, testPrefix) == 0)
       {
         // get function result
-        std::wstring error = callPythonFunction(modDict.get(), keyStr, nullptr);
+        std::wstring error = callPythonFunction(modDict, keyStr, nullptr);
         if (!error.empty())
           result.push_back(error);
       }

@@ -36,12 +36,12 @@ TEST_CLASS(PyARParamPythonTests)
 {
 public:
 
-  TEST_METHOD(PythonTest)
+  TEST_METHOD(ARParamPythonTest)
   {
     AssertPythonModule("ARParamTest");
   }
 
-  TEST_METHOD(LoadDataTest)
+  TEST_METHOD(ARParamLoadDataTest)
   {
     // load test data
     ARParam testParam;

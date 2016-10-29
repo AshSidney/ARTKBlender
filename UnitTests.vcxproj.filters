@@ -36,6 +36,9 @@
     <ClCompile Include="UnitTests\PyTestHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTests\ARHandleTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="UnitTests\Python\ARParamTest.py">
@@ -43,6 +46,9 @@
     </None>
     <None Include="UnitTests\Data\camera_para.dat">
       <Filter>Data Files</Filter>
+    </None>
+    <None Include="UnitTests\Python\ARHandleTest.py">
+      <Filter>Python Test Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

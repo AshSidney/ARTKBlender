@@ -4,5 +4,5 @@
 
 /.vs
 /x64
-/x86
+/Win32
 /UnitTests/Python/__pycache__

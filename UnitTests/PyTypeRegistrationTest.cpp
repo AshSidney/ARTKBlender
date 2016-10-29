@@ -239,8 +239,8 @@ public:
 
     ARTKBlender::PyTypeRegistration::addAllTypes(testMod);
 
-    ARTKBlender::PyObjectOwner modDict (PyModule_GetDict(testMod));
-    PyObject * modType = PyDict_GetItemString(modDict.get(), "TestPyType");
+    PyObject * modDict = PyModule_GetDict(testMod);
+    PyObject * modType = PyDict_GetItemString(modDict, "TestPyType");
 
     Assert::IsTrue(PyType_CheckExact(modType));
   }
