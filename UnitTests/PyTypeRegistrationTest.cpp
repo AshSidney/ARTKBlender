@@ -172,66 +172,118 @@ public:
   }
 };
 
-/// test python data structure
-struct TestPythonObject
-{
-  PyObject_HEAD
-  /// test data
-  size_t testData;
-};
-
-/// python type structure for ARParam
-static PyTypeObject TestPythonType = {
-  PyVarObject_HEAD_INIT(NULL, 0)
-  "artk.TestPythonType",     /* tp_name */
-  sizeof(TestPythonObject),  /* tp_basicsize */
-  0,                         /* tp_itemsize */
-  0,                         /* tp_dealloc */
-  0,                         /* tp_print */
-  0,                         /* tp_getattr */
-  0,                         /* tp_setattr */
-  0,                         /* tp_reserved */
-  0,                         /* tp_repr */
-  0,                         /* tp_as_number */
-  0,                         /* tp_as_sequence */
-  0,                         /* tp_as_mapping */
-  0,                         /* tp_hash  */
-  0,                         /* tp_call */
-  0,                         /* tp_str */
-  0,                         /* tp_getattro */
-  0,                         /* tp_setattro */
-  0,                         /* tp_as_buffer */
-  Py_TPFLAGS_DEFAULT,        /* tp_flags */
-  "TestPython objects",      /* tp_doc */
-};
-
-// module definition
-static PyModuleDef TestPyModule =
-{
-  PyModuleDef_HEAD_INIT,
-  "test",
-  "Test Python module",
-  -1
-};
-
 
 // test class for PyTypeRegistration using Python
 TEST_CLASS(PyTypeRegistrationPythonTests)
 {
 public:
-  TEST_METHOD_INITIALIZE(InitTest)
-  {
-    Py_Initialize();
-  }
-
-  TEST_METHOD_CLEANUP(ClearTest)
-  {
-    Py_Finalize();
-  }
 
   TEST_METHOD(RegisterType2Python)
   {
+    /// test python data structure
+    struct TestPythonObject
+    {
+      PyObject_HEAD
+        /// test data
+        size_t testData;
+    };
+
+    /// python type structure for ARParam
+    PyTypeObject TestPythonType = {
+      PyVarObject_HEAD_INIT(NULL, 0)
+      "artk.TestPythonType",     /* tp_name */
+      sizeof(TestPythonObject),  /* tp_basicsize */
+      0,                         /* tp_itemsize */
+      0,                         /* tp_dealloc */
+      0,                         /* tp_print */
+      0,                         /* tp_getattr */
+      0,                         /* tp_setattr */
+      0,                         /* tp_reserved */
+      0,                         /* tp_repr */
+      0,                         /* tp_as_number */
+      0,                         /* tp_as_sequence */
+      0,                         /* tp_as_mapping */
+      0,                         /* tp_hash  */
+      0,                         /* tp_call */
+      0,                         /* tp_str */
+      0,                         /* tp_getattro */
+      0,                         /* tp_setattro */
+      0,                         /* tp_as_buffer */
+      Py_TPFLAGS_DEFAULT,        /* tp_flags */
+      "TestPython objects",      /* tp_doc */
+    };
+
+    // module definition
+    PyModuleDef TestPyModule =
+    {
+      PyModuleDef_HEAD_INIT,
+      "test",
+      "Test Python module",
+      -1
+    };
+
     ARTKBlender::PyTypeRegistration pyType("TestPyType", TestPythonType);
+
+    Assert::IsTrue(ARTKBlender::PyTypeRegistration::getAllReady());
+
+    ARTKBlender::PyObjectOwner testMod (PyModule_Create(&TestPyModule));
+
+    ARTKBlender::PyTypeRegistration::addAllTypes(testMod.get());
+
+    PyObject * modDict = PyModule_GetDict(testMod.get());
+    PyObject * modType = PyDict_GetItemString(modDict, "TestPyType");
+
+    Assert::IsTrue(PyType_CheckExact(modType));
+
+    Assert::IsTrue(ARTKBlender::getPyType<PyTypeObject>(modType) == &TestPythonType);
+  }
+
+  TEST_METHOD(RegisterTypeEnum2Python)
+  {
+    /// test python data structure
+    struct TestPythonObject
+    {
+      PyObject_HEAD
+        /// test data
+        size_t testData;
+    };
+
+    /// python type structure for ARParam
+    PyTypeObject TestPythonType = {
+      PyVarObject_HEAD_INIT(NULL, 0)
+      "artk.TestPythonType",     /* tp_name */
+      sizeof(TestPythonObject),  /* tp_basicsize */
+      0,                         /* tp_itemsize */
+      0,                         /* tp_dealloc */
+      0,                         /* tp_print */
+      0,                         /* tp_getattr */
+      0,                         /* tp_setattr */
+      0,                         /* tp_reserved */
+      0,                         /* tp_repr */
+      0,                         /* tp_as_number */
+      0,                         /* tp_as_sequence */
+      0,                         /* tp_as_mapping */
+      0,                         /* tp_hash  */
+      0,                         /* tp_call */
+      0,                         /* tp_str */
+      0,                         /* tp_getattro */
+      0,                         /* tp_setattro */
+      0,                         /* tp_as_buffer */
+      Py_TPFLAGS_DEFAULT,        /* tp_flags */
+      "TestPython objects",      /* tp_doc */
+    };
+
+    // module definition
+    PyModuleDef TestPyModule =
+    {
+      PyModuleDef_HEAD_INIT,
+      "test",
+      "Test Python module",
+      -1
+    };
+
+    ARTKBlender::PyTypeRegistrationEnum::EnumMap testMap = { {"abc", 2}, {"cde", 5} };
+    ARTKBlender::PyTypeRegistrationEnum pyType("TestPyTypeEnum", TestPythonType, testMap);
 
     Assert::IsTrue(ARTKBlender::PyTypeRegistration::getAllReady());
 
@@ -240,9 +292,14 @@ public:
     ARTKBlender::PyTypeRegistration::addAllTypes(testMod);
 
     PyObject * modDict = PyModule_GetDict(testMod);
-    PyObject * modType = PyDict_GetItemString(modDict, "TestPyType");
+    PyObject * modType = PyDict_GetItemString(modDict, "TestPyTypeEnum");
 
     Assert::IsTrue(PyType_CheckExact(modType));
+
+    Assert::IsTrue(ARTKBlender::getPyType<PyTypeObject>(modType) == &TestPythonType);
+
+    Assert::AreEqual(PyLong_AsLong(PyDict_GetItemString(TestPythonType.tp_dict, "cde")), long(5));
+    Assert::AreEqual(PyLong_AsLong(PyDict_GetItemString(TestPythonType.tp_dict, "abc")), long(2));
   }
 };
 

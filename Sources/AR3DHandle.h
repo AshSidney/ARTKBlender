@@ -19,27 +19,23 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 -----------------------------------------------------------------------------
 */
 
-#include "CppUnitTest.h"
+#pragma once
 
-#include "PyTestHelper.h"
 #include <AR/ar.h>
-#include "PyObjectHelper.h"
+#include <Python.h>
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
-
-namespace UnitTests
+namespace ARTKBlender
 {
 
-// test class for PyAR3DHandle type using Python
-TEST_CLASS(PyARHandlePythonTests)
+/// python data structure for AR3DHandle
+struct PyAR3DHandle
 {
-public:
-
-  TEST_METHOD(ARHandlePythonTest)
-  {
-    AssertPythonModule("ARHandleTest");
-  }
+  PyObject_HEAD
+  /// AR3DHandle structure
+  AR3DHandle * handle;
 };
+
+// declaration of python module type
+extern PyTypeObject AR3DHandleType;
 
 }

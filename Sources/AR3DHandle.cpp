@@ -19,7 +19,7 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 -----------------------------------------------------------------------------
 */
 
-#include "ARHandle.h"
+#include "AR3DHandle.h"
 
 #include "ARParam.h"
 #include "PyObjectHelper.h"
@@ -29,77 +29,54 @@ namespace ARTKBlender
 {
 
 /// ARHandle object allocation
-PyObject * PyARHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+PyObject * PyAR3DHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
   // allocate object
   PyObject * self = type->tp_alloc(type, 0);
   // initialize object structure
-  PyARHandle * selfObj = getPyType<PyARHandle>(self);
+  PyAR3DHandle * selfObj = getPyType<PyAR3DHandle>(self);
   selfObj->handle = nullptr;
-  selfObj->paramLT = nullptr;
   // return allocated object
   return self;
 }
 
-// ARHandle object deallocation
-void PyARHandle_dealloc(PyARHandle * self)
+// AR3DHandle object deallocation
+void PyAR3DHandle_dealloc(PyAR3DHandle * self)
 {
   // release data
-  arDeleteHandle(self->handle);
-  arParamLTFree(&self->paramLT);
+  ar3DDeleteHandle(&self->handle);
   // release object
   deallocPyObject(self);
 }
 
-// ARHandle object initialization
-int PyARHandle_init(PyARHandle * self, PyObject *args, PyObject *kwds)
+// AR3DHandle object initialization
+int PyAR3DHandle_init(PyAR3DHandle * self, PyObject *args, PyObject *kwds)
 {
   // parse parameter
   PyObject *param = NULL;
-  int pixFmt = -1;
-  static char *kwlist[] = { "param", "pixelFormat", NULL };
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!i", kwlist, &ARParamType, &param, &pixFmt))
-    return -1;
-
-  // check pixel format
-  if (pixFmt < AR_PIXEL_FORMAT_INVALID || pixFmt > AR_PIXEL_FORMAT_MAX)
-    return -1;
-
-  // create lookup table
-  self->paramLT = arParamLTCreate(getPyType<PyARParam>(param)->param, AR_PARAM_LT_DEFAULT_OFFSET);
-  if (self->paramLT == nullptr)
+  static char *kwlist[] = { "param", NULL };
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!", kwlist, &ARParamType, &param))
     return -1;
 
   // create handle
-  self->handle = arCreateHandle(self->paramLT);
+  self->handle = ar3DCreateHandle(getPyType<PyARParam>(param)->param);
   if (self->handle == nullptr)
-    return -1;
-
-  // set pixel format
-  if (arSetPixelFormat(self->handle, AR_PIXEL_FORMAT(pixFmt)) < 0)
     return -1;
 
   return 0;
 }
 
 
-// get pixel format
-PyObject * PyARHandle_getPixelFormat(PyARHandle * self, void * closure)
-{
-  return Py_BuildValue("i", self->handle->arPixelFormat);
-}
-
-
 // members descriptions
-PyGetSetDef PyARHandle_getseters[] =
+PyGetSetDef PyAR3DHandle_getseters[] =
 {
-  { "pixelFormat", (getter)PyARHandle_getPixelFormat, NULL,
-  "pixel format", NULL },
+  /*{ "pixelFormat", (getter)PyARHandle_getPixelFormat, NULL,
+  "pixel format", NULL },*/
   { NULL }  /* Sentinel */
 };
 
 /// methods descriptions
-PyMethodDef PyARHandle_methods[] =
+PyMethodDef PyAR3DHandle_methods[] =
 {
   /*{ "load", (PyCFunction)PyARParam_load, METH_VARARGS,
   "Loads data from file, return true, if successful" },*/
@@ -108,13 +85,13 @@ PyMethodDef PyARHandle_methods[] =
 
 
 /// python type structure for ARHandle
-PyTypeObject ARHandleType =
+PyTypeObject AR3DHandleType =
 {
   PyVarObject_HEAD_INIT(NULL, 0)
-  "ARTKBlender.ARHandle",    /* tp_name */
-  sizeof(PyARHandle),        /* tp_basicsize */
+  "ARTKBlender.AR3DHandle",  /* tp_name */
+  sizeof(PyAR3DHandle),      /* tp_basicsize */
   0,                         /* tp_itemsize */
-  (destructor)PyARHandle_dealloc,  /* tp_dealloc */
+  (destructor)PyAR3DHandle_dealloc,  /* tp_dealloc */
   0,                         /* tp_print */
   0,                         /* tp_getattr */
   0,                         /* tp_setattr */
@@ -130,28 +107,28 @@ PyTypeObject ARHandleType =
   0,                         /* tp_setattro */
   0,                         /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT,        /* tp_flags */
-  "ARHandle objects",        /* tp_doc */
+  "AR3DHandle objects",      /* tp_doc */
   0,                         /* tp_traverse */
   0,                         /* tp_clear */
   0,                         /* tp_richcompare */
   0,                         /* tp_weaklistoffset */
   0,                         /* tp_iter */
   0,                         /* tp_iternext */
-  0, //PyARHandle_methods,        /* tp_methods */
+  0, //PyAR3DHandle_methods,        /* tp_methods */
   0,                         /* tp_members */
-  PyARHandle_getseters,      /* tp_getset */
+  0, //PyAR3DHandle_getseters,      /* tp_getset */
   0,                         /* tp_base */
   0,                         /* tp_dict */
   0,                         /* tp_descr_get */
   0,                         /* tp_descr_set */
   0,                         /* tp_dictoffset */
-  (initproc)PyARHandle_init, /* tp_init */
+  (initproc)PyAR3DHandle_init, /* tp_init */
   0,                         /* tp_alloc */
-  PyARHandle_new,            /* tp_new */
+  PyAR3DHandle_new,          /* tp_new */
 };
 
 
 // registration object
-static PyTypeRegistration ARHandleReg("ARHandle", ARHandleType);
+static PyTypeRegistration AR3DHandleReg("AR3DHandle", AR3DHandleType);
 
 }

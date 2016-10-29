@@ -31,15 +31,15 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 namespace UnitTests
 {
 
-// test class for PyAR3DHandle type using Python
-TEST_CLASS(PyARHandlePythonTests)
-{
-public:
-
-  TEST_METHOD(ARHandlePythonTest)
+  // test class for PyAR3DHandle type using Python
+  TEST_CLASS(PyAR3DHandlePythonTests)
   {
-    AssertPythonModule("ARHandleTest");
-  }
-};
+  public:
+
+    TEST_METHOD(AR3DHandlePythonTest)
+    {
+      AssertPythonModule("AR3DHandleTest");
+    }
+  };
 
 }

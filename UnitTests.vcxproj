@@ -170,6 +170,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Sources\PyTypeRegistration.cpp" />
+    <ClCompile Include="UnitTests\AR3DHandleTest.cpp" />
     <ClCompile Include="UnitTests\ARHandleTest.cpp" />
     <ClCompile Include="UnitTests\ARParamTest.cpp" />
     <ClCompile Include="UnitTests\PyTestHelper.cpp" />
@@ -177,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="UnitTests\Data\camera_para.dat" />
+    <None Include="UnitTests\Python\AR3DHandleTest.py" />
     <None Include="UnitTests\Python\ARHandleTest.py" />
     <None Include="UnitTests\Python\ARParamTest.py" />
   </ItemGroup>
