@@ -42,6 +42,9 @@
     <ClCompile Include="UnitTests\AR3DHandleTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UnitTests\ARPattHandleTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="UnitTests\Python\ARParamTest.py">
@@ -54,6 +57,12 @@
       <Filter>Python Test Files</Filter>
     </None>
     <None Include="UnitTests\Python\AR3DHandleTest.py">
+      <Filter>Python Test Files</Filter>
+    </None>
+    <None Include="UnitTests\Data\hiro.patt">
+      <Filter>Data Files</Filter>
+    </None>
+    <None Include="UnitTests\Python\ARPattHandleTest.py">
       <Filter>Python Test Files</Filter>
     </None>
   </ItemGroup>

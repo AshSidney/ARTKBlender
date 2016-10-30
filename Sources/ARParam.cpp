@@ -95,7 +95,7 @@ PyObject * PyARParam_getMatrix(PyARParam * self, void * closure)
     self->param->mat[2][0], self->param->mat[2][1], self->param->mat[2][2], self->param->mat[2][3]);
 }
 
-// get matrix
+// get distortion 
 PyObject * PyARParam_getDistFactor(PyARParam * self, void * closure)
 {
   return Py_BuildValue("(ddddddddd)",
@@ -112,8 +112,10 @@ PyObject * PyARParam_load (PyARParam * self, PyObject * args)
   if (!PyArg_ParseTuple(args, "s", &fileName))
     return Py_False;
 
-  // load data from file
-  return arParamLoad(fileName, 1, self->param) == 0 ? Py_True : Py_False;
+  // load data from file and return result
+  PyObject * rslt = arParamLoad(fileName, 1, self->param) == 0 ? Py_True : Py_False;
+  Py_INCREF(rslt);
+  return rslt;
 }
 
 
@@ -125,7 +127,7 @@ PyGetSetDef PyARParam_getseters[] =
   { "matrix", (getter)PyARParam_getMatrix, NULL,
     "projection matrix", NULL },
   { "distFactor", (getter)PyARParam_getDistFactor, NULL,
-    "distorsion parameters", NULL },
+    "distortion parameters", NULL },
     { NULL }  /* Sentinel */
 };
 
