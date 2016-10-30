@@ -26,8 +26,8 @@ namespace UnitTests
 /**
     Class for running tests from Python files.
     Object of this class loads python file as module and runs every function
-    with prefix "test". These functions must return boolean value.
-    If true is returned, test succeded. Otherwise error message is returned.
+    with prefix "test". These functions must return string value.
+    If empty string is returned, test succeded. Otherwise error message is returned.
 */
 class PyTestHelper
 {

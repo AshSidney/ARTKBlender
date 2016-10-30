@@ -24,4 +24,4 @@ def test_AR3DHandleConstruct ():
   if not param.load('../../UnitTests/Data/camera_para.dat'):
     return False
   handle = ARTKBlender.AR3DHandle(param)
-  return isinstance(handle, ARTKBlender.AR3DHandle)
+  return '' if isinstance(handle, ARTKBlender.AR3DHandle) else 'handle isn\'t instance of AR3DHandle'

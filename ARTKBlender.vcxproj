@@ -168,6 +168,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\AR3DHandle.cpp" />
     <ClCompile Include="Sources\ARHandle.cpp" />
+    <ClCompile Include="Sources\ARMarkerInfo.cpp" />
     <ClCompile Include="Sources\ARParam.cpp" />
     <ClCompile Include="Sources\ARPattHandle.cpp" />
     <ClCompile Include="Sources\ARPixelFormat.cpp" />
@@ -177,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="Sources\AR3DHandle.h" />
     <ClInclude Include="Sources\ARHandle.h" />
+    <ClInclude Include="Sources\ARMarkerInfo.h" />
     <ClInclude Include="Sources\ARParam.h" />
     <ClInclude Include="Sources\ARPattHandle.h" />
     <ClInclude Include="Sources\ARPixelFormat.h" />

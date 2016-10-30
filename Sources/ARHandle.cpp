@@ -23,6 +23,7 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ARParam.h"
 #include "ARPattHandle.h"
+#include "ARMarkerInfo.h"
 #include "PyObjectHelper.h"
 #include "PyTypeRegistration.h"
 
@@ -39,6 +40,8 @@ PyObject * PyARHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   selfObj->handle = nullptr;
   selfObj->paramLT = nullptr;
   selfObj->attachPatt = new PyObjectOwner;
+  selfObj->markers = new PyObjectOwner(PyTuple_New(0));
+  selfObj->updateMarkers = false;
   // return allocated object
   return self;
 }
@@ -51,6 +54,7 @@ void PyARHandle_dealloc(PyARHandle * self)
   arDeleteHandle(self->handle);
   arParamLTFree(&self->paramLT);
   delete self->attachPatt;
+  delete self->markers;
   // release object
   deallocPyObject(self);
 }
@@ -109,10 +113,70 @@ int PyARHandle_setAttachPatt (PyARHandle * self, PyObject *value, void *closure)
     return -1;
   }
 
+  // if value is null, detach pattern handle
+  if (value == NULL)
+  {
+    if (arPattDetach(self->handle) < 0)
+    {
+      PyErr_SetString(PyExc_TypeError, "Detaching of pattern handle failed");
+      return -1;
+    }
+  }
+  // otherwise attach pattern handle
+  else if (arPattAttach(self->handle, getPyType<PyARPattHandle>(value)->handle) < 0)
+  {
+    PyErr_SetString(PyExc_TypeError, "Attaching of pattern handle failed");
+    return -1;
+  }
+
   // set new value
   *self->attachPatt = PyObjectOwner(value, true);
 
   return 0;
+}
+
+// get detected markers list
+PyObject * PyARHandle_getMarkers(PyARHandle * self, void * closure)
+{
+  // check if markers should be updated
+  if (self->updateMarkers)
+  {
+    self->updateMarkers = false;
+    // get marker data
+    size_t markerCount = arGetMarkerNum(self->handle);
+    ARMarkerInfo * markers = arGetMarker(self->handle);
+    // create new tuple of markers
+    PyObjectOwner pyMarkers (PyTuple_New(markerCount));
+    for (size_t i = 0; i < markerCount; ++i)
+    {
+      PyARMarkerInfo * pyMarker = PyObject_New(PyARMarkerInfo, &ARMarkerInfoType);
+      pyMarker->marker = &markers[i];
+      PyTuple_SetItem(pyMarkers.get(), i, getPyObject(pyMarker));
+    }
+    // set new tuple
+    *self->markers = pyMarkers;
+  }
+
+  // return list of markers
+  return self->markers->returnValue();
+}
+
+// detect markers in image data
+PyObject * PyARHandle_detect(PyARHandle * self, PyObject * args)
+{
+  // get image data
+  Py_buffer image;
+  if (!PyArg_ParseTuple(args, "s*", &image))
+    Py_RETURN_FALSE;
+
+  // process image data to detect markers
+  if (arDetectMarker(self->handle, reinterpret_cast<ARUint8*>(image.buf)) < 0)
+    Py_RETURN_FALSE;
+
+  // set flag to update markers;
+  self->updateMarkers = true;
+
+  Py_RETURN_TRUE;
 }
 
 
@@ -123,14 +187,16 @@ PyGetSetDef PyARHandle_getseters[] =
   "pixel format", NULL },
   { "attachPatt", (getter)PyARHandle_getAttachPatt, (setter)PyARHandle_setAttachPatt,
   "attached pattern handle", NULL },
+  { "markers", (getter)PyARHandle_getMarkers, NULL,
+  "list of detected markers", NULL },
   { NULL }  /* Sentinel */
 };
 
 /// methods descriptions
 PyMethodDef PyARHandle_methods[] =
 {
-  /*{ "load", (PyCFunction)PyARParam_load, METH_VARARGS,
-  "Loads data from file, return true, if successful" },*/
+  { "detect", (PyCFunction)PyARHandle_detect, METH_VARARGS,
+  "Detects markers in image data, return true, if successful" },
   { NULL }  /* Sentinel */
 };
 
@@ -165,7 +231,7 @@ PyTypeObject ARHandleType =
   0,                         /* tp_weaklistoffset */
   0,                         /* tp_iter */
   0,                         /* tp_iternext */
-  0, //PyARHandle_methods,        /* tp_methods */
+  PyARHandle_methods,        /* tp_methods */
   0,                         /* tp_members */
   PyARHandle_getseters,      /* tp_getset */
   0,                         /* tp_base */

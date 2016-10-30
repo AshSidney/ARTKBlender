@@ -19,64 +19,50 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 -----------------------------------------------------------------------------
 */
 
-#include "AR3DHandle.h"
+#include "ARMarkerInfo.h"
 
-#include "ARParam.h"
 #include "PyObjectHelper.h"
 #include "PyTypeRegistration.h"
 
 namespace ARTKBlender
 {
 
-/// AR3DHandle object allocation
-PyObject * PyAR3DHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+/// ARMarkerInfo object allocation
+PyObject * PyARMarkerInfo_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
   // allocate object
   PyObject * self = type->tp_alloc(type, 0);
   // initialize object structure
-  PyAR3DHandle * selfObj = getPyType<PyAR3DHandle>(self);
-  selfObj->handle = nullptr;
+  PyARMarkerInfo * selfObj = getPyType<PyARMarkerInfo>(self);
+  selfObj->marker = nullptr;
   // return allocated object
   return self;
 }
 
-// AR3DHandle object deallocation
-void PyAR3DHandle_dealloc(PyAR3DHandle * self)
+// ARMarkerInfo object deallocation
+void PyARMarkerInfo_dealloc(PyARMarkerInfo * self)
 {
-  // release data
-  ar3DDeleteHandle(&self->handle);
   // release object
   deallocPyObject(self);
 }
 
-// AR3DHandle object initialization
-int PyAR3DHandle_init(PyAR3DHandle * self, PyObject *args, PyObject *kwds)
+// get ID of detected pattern
+PyObject * PyARMarkerInfo_getID(PyARMarkerInfo * self, void * closure)
 {
-  // parse parameter
-  PyObject *param = NULL;
-  static char *kwlist[] = { "param", NULL };
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!", kwlist, &ARParamType, &param))
-    return -1;
-
-  // create handle
-  self->handle = ar3DCreateHandle(getPyType<PyARParam>(param)->param);
-  if (self->handle == nullptr)
-    return -1;
-
-  return 0;
+  return PyLong_FromLong(self->marker->id);
 }
 
 
 // members descriptions
-PyGetSetDef PyAR3DHandle_getseters[] =
+PyGetSetDef PyARMarkerInfo_getseters[] =
 {
-  /*{ "pixelFormat", (getter)PyARHandle_getPixelFormat, NULL,
-  "pixel format", NULL },*/
+  { "id", (getter)PyARMarkerInfo_getID, NULL,
+  "pattern ID", NULL },
   { NULL }  /* Sentinel */
 };
 
 /// methods descriptions
-PyMethodDef PyAR3DHandle_methods[] =
+PyMethodDef PyARMarkerInfo_methods[] =
 {
   /*{ "load", (PyCFunction)PyARParam_load, METH_VARARGS,
   "Loads data from file, return true, if successful" },*/
@@ -84,14 +70,14 @@ PyMethodDef PyAR3DHandle_methods[] =
 };
 
 
-/// python type structure for AR3DHandle
-PyTypeObject AR3DHandleType =
+/// python type structure for ARMarkerInfo
+PyTypeObject ARMarkerInfoType =
 {
   PyVarObject_HEAD_INIT(NULL, 0)
-  "ARTKBlender.AR3DHandle",  /* tp_name */
-  sizeof(PyAR3DHandle),      /* tp_basicsize */
+  "ARTKBlender.ARMarkerInfo",  /* tp_name */
+  sizeof(PyARMarkerInfo),      /* tp_basicsize */
   0,                         /* tp_itemsize */
-  (destructor)PyAR3DHandle_dealloc,  /* tp_dealloc */
+  (destructor)PyARMarkerInfo_dealloc,  /* tp_dealloc */
   0,                         /* tp_print */
   0,                         /* tp_getattr */
   0,                         /* tp_setattr */
@@ -107,7 +93,7 @@ PyTypeObject AR3DHandleType =
   0,                         /* tp_setattro */
   0,                         /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT,        /* tp_flags */
-  "AR3DHandle objects",      /* tp_doc */
+  "ARMarkerInfo objects",    /* tp_doc */
   0,                         /* tp_traverse */
   0,                         /* tp_clear */
   0,                         /* tp_richcompare */
@@ -116,19 +102,19 @@ PyTypeObject AR3DHandleType =
   0,                         /* tp_iternext */
   0, //PyAR3DHandle_methods,        /* tp_methods */
   0,                         /* tp_members */
-  0, //PyAR3DHandle_getseters,      /* tp_getset */
+  PyARMarkerInfo_getseters,  /* tp_getset */
   0,                         /* tp_base */
   0,                         /* tp_dict */
   0,                         /* tp_descr_get */
   0,                         /* tp_descr_set */
   0,                         /* tp_dictoffset */
-  (initproc)PyAR3DHandle_init, /* tp_init */
+  0,                         /* tp_init */
   0,                         /* tp_alloc */
-  PyAR3DHandle_new,          /* tp_new */
+  PyARMarkerInfo_new,        /* tp_new */
 };
 
 
 // registration object
-static PyTypeRegistration AR3DHandleReg("AR3DHandle", AR3DHandleType);
+static PyTypeRegistration ARMarkerInfoReg("ARMarkerInfo", ARMarkerInfoType);
 
 }

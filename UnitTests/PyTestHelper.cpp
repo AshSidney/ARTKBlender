@@ -83,12 +83,16 @@ static std::wstring callPythonFunction(PyObject * modDict, const std::string & t
   {
     // call function
     PyObjectOwner rslt(PyObject_CallObject(func, args));
-    // check result of function
-    if (!rslt.isNull() && PyObject_IsTrue(rslt.get()) != 0)
+    // check result of function, if it's string with zero length, it succeded
+    if (!rslt.isNull() && PyUnicode_Check(rslt.get()) != 0 && PyUnicode_GetSize(rslt.get()) == 0)
       // return if success
       return error.str();
     // otherwise prepare error message
     error << testName.c_str();
+    // add returned string
+    if (!rslt.isNull() && PyUnicode_Check(rslt.get()) != 0)
+      error << ": " << PyUnicode_AsUnicode(rslt.get());
+    // add error description
     PyObjectOwner excDesc[3];
     PyErr_Fetch(&excDesc[0].get(), &excDesc[1].get(), &excDesc[2].get());
     for (auto & exc : excDesc)

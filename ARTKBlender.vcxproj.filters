@@ -36,6 +36,9 @@
     <ClCompile Include="Sources\ARPattHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\ARMarkerInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\PyTypeRegistration.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\ARPattHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\ARMarkerInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

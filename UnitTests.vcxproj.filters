@@ -65,10 +65,18 @@
     <None Include="UnitTests\Python\ARPattHandleTest.py">
       <Filter>Python Test Files</Filter>
     </None>
+    <None Include="UnitTests\Data\hiro_marker.raw">
+      <Filter>Data Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTests\PyTestHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="UnitTests\Data\hiro_marker.png">
+      <Filter>Data Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

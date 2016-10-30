@@ -22,4 +22,4 @@ import ARTKBlender
 def test_ARPattHandleConstruct ():
   handle = ARTKBlender.ARPattHandle()
   pattID = handle.load('../../UnitTests/Data/hiro.patt')
-  return pattID == 0
+  return '' if pattID == 0 else 'Invalid pattern ID'

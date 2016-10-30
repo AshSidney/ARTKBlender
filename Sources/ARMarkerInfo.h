@@ -24,28 +24,18 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include <AR/ar.h>
 #include <Python.h>
 
-#include "PyObjectHelper.h"
-
 namespace ARTKBlender
 {
 
-/// python data structure for ARHandle
-struct PyARHandle
+/// python data structure for ARMarkerInfo
+struct PyARMarkerInfo
 {
   PyObject_HEAD
-  /// ARHandle structure
-  ARHandle * handle;
-  /// lookup table from ARParam
-  ARParamLT * paramLT;
-  /// attached pattern handle
-  PyObjectOwner * attachPatt;
-  /// list of detected markers
-  PyObjectOwner * markers;
-  /// flag to update markers - true, if new detection was performed
-  bool updateMarkers;
+  /// AR3DHandle structure
+  ARMarkerInfo * marker;
 };
 
 // declaration of python module type
-extern PyTypeObject ARHandleType;
+extern PyTypeObject ARMarkerInfoType;
 
 }

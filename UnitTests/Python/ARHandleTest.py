@@ -19,31 +19,61 @@
 
 import ARTKBlender
 
+
 def test_ARHandleConstruct ():
   param = ARTKBlender.ARParam()
   if not param.load('../../UnitTests/Data/camera_para.dat'):
-    return False
+    return 'Parameters load failed'
   handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
-  return isinstance(handle, ARTKBlender.ARHandle) and handle.pixelFormat == ARTKBlender.ARPixelFormat.RGB
+  if not isinstance(handle, ARTKBlender.ARHandle):
+    return 'handle isn\'t instance of ARHandle'
+  return '' if handle.pixelFormat == ARTKBlender.ARPixelFormat.RGB else 'improper pixel format'
 
 def test_ARHandleConstructOtherPixelFormat ():
   param = ARTKBlender.ARParam()
   if not param.load('../../UnitTests/Data/camera_para.dat'):
-    return False
+    return 'Parameters load failed'
   handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.MONO)
-  return isinstance(handle, ARTKBlender.ARHandle) and handle.pixelFormat == ARTKBlender.ARPixelFormat.MONO
+  if not isinstance(handle, ARTKBlender.ARHandle):
+    return 'handle isn\'t instance of ARHandle'
+  return '' if handle.pixelFormat == ARTKBlender.ARPixelFormat.MONO else 'improper pixel format'
 
 def test_ARHandleAttachPattern ():
   param = ARTKBlender.ARParam()
   if not param.load('../../UnitTests/Data/camera_para.dat'):
-    return False
+    return 'Parameters load failed'
   handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
   if handle.attachPatt is not None:
-    return False
+    return 'No pattern should be attached'
   pattHandle = ARTKBlender.ARPattHandle()
   pattHandle.load('../../UnitTests/Data/hiro.patt')
   handle.attachPatt = pattHandle
   if handle.attachPatt != pattHandle:
-    return False
+    return 'Invalid pattern attached'
   del handle.attachPatt
-  return handle.attachPatt is None
+  return '' if handle.attachPatt is None else 'No pattern should be attached'
+
+def test_ARHandleDetect ():
+  param = ARTKBlender.ARParam()
+  if not param.load('../../UnitTests/Data/camera_para.dat'):
+    return 'Parameters load failed'
+  imgFile = open('../../UnitTests/Data/hiro_marker.raw', 'rb')
+  image = imgFile.read()
+  imgFile.close()
+  imgSize = (254, 207)
+  if len(image) != imgSize[0] * imgSize[1] * 3:
+    return 'Image data have invalid size = ' + str(len(image))
+  param.size = imgSize
+  handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
+  pattHandle = ARTKBlender.ARPattHandle()
+  pattID = pattHandle.load('../../UnitTests/Data/hiro.patt')
+  if pattID != 0:
+    return 'Invalid pattern ID'
+  handle.attachPatt = pattHandle
+  if len(handle.markers) != 0:
+    return 'No markers should be available'
+  if not handle.detect(image):
+    return 'Marker detection failed'
+  if len(handle.markers) != 1:
+    return 'One marker should be available'
+  return '' if handle.markers[0].id == 0 else 'Invalid detected pattern ID'
