@@ -22,6 +22,7 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include "ARHandle.h"
 
 #include "ARParam.h"
+#include "ARPattHandle.h"
 #include "PyObjectHelper.h"
 #include "PyTypeRegistration.h"
 
@@ -37,6 +38,7 @@ PyObject * PyARHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
   PyARHandle * selfObj = getPyType<PyARHandle>(self);
   selfObj->handle = nullptr;
   selfObj->paramLT = nullptr;
+  selfObj->attachPatt = new PyObjectOwner;
   // return allocated object
   return self;
 }
@@ -45,8 +47,10 @@ PyObject * PyARHandle_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 void PyARHandle_dealloc(PyARHandle * self)
 {
   // release data
+  arPattDetach(self->handle);
   arDeleteHandle(self->handle);
   arParamLTFree(&self->paramLT);
+  delete self->attachPatt;
   // release object
   deallocPyObject(self);
 }
@@ -89,12 +93,36 @@ PyObject * PyARHandle_getPixelFormat(PyARHandle * self, void * closure)
   return Py_BuildValue("i", self->handle->arPixelFormat);
 }
 
+// get attached pattern handle
+PyObject * PyARHandle_getAttachPatt(PyARHandle * self, void * closure)
+{
+  return self->attachPatt->returnValue();
+}
+
+// attach pattern handle
+int PyARHandle_setAttachPatt (PyARHandle * self, PyObject *value, void *closure)
+{
+  // check value
+  if (value != NULL && !isInstance(value, ARPattHandleType))
+  {
+    PyErr_SetString(PyExc_TypeError, "Value has to be ARPattHandle object");
+    return -1;
+  }
+
+  // set new value
+  *self->attachPatt = PyObjectOwner(value, true);
+
+  return 0;
+}
+
 
 // members descriptions
 PyGetSetDef PyARHandle_getseters[] =
 {
   { "pixelFormat", (getter)PyARHandle_getPixelFormat, NULL,
   "pixel format", NULL },
+  { "attachPatt", (getter)PyARHandle_getAttachPatt, (setter)PyARHandle_setAttachPatt,
+  "attached pattern handle", NULL },
   { NULL }  /* Sentinel */
 };
 

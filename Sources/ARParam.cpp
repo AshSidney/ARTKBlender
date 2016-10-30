@@ -110,12 +110,13 @@ PyObject * PyARParam_load (PyARParam * self, PyObject * args)
   // get file name
   const char * fileName = nullptr;
   if (!PyArg_ParseTuple(args, "s", &fileName))
-    return Py_False;
+    Py_RETURN_FALSE;
 
   // load data from file and return result
-  PyObject * rslt = arParamLoad(fileName, 1, self->param) == 0 ? Py_True : Py_False;
-  Py_INCREF(rslt);
-  return rslt;
+  if (arParamLoad(fileName, 1, self->param) != 0)
+    Py_RETURN_FALSE;
+
+  Py_RETURN_TRUE;
 }
 
 

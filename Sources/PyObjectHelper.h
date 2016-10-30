@@ -32,6 +32,7 @@ namespace ARTKBlender
 
 /**
     Convert python object pointer to pointer to type structure.
+    \param obj pointer to python object
     \return pointer to type structure
 */ 
 template <class PyType> PyType * getPyType(PyObject * obj)
@@ -41,6 +42,7 @@ template <class PyType> PyType * getPyType(PyObject * obj)
 
 /**
     Convert pointer to type structure to python object pointer.
+    \param obj pointer to type structure
     \return pointer to type structure
 */ 
 template <class PyType> PyObject * getPyObject(PyType * obj)
@@ -50,11 +52,23 @@ template <class PyType> PyObject * getPyObject(PyType * obj)
 
 /**
     Deallocate pointer to type structure.
+    \param obj pointer to type structure
     \param pointer to type structure
 */ 
 template <class PyType> void deallocPyObject(PyType * obj)
 {
   Py_TYPE(obj)->tp_free(getPyObject(obj));
+}
+
+/**
+    Check python object pointer is of required type.
+    \param obj pointer to python object
+    \param pyTypeDef reference to python type definition
+    \return true if object is of required type
+*/
+template <class PyType> bool isInstance(PyObject * obj, PyType & pyTypeDef)
+{
+  return PyObject_IsInstance(obj, (PyObject *)&pyTypeDef) == 1;
 }
 
 
@@ -71,7 +85,7 @@ public:
   */
   PyObjectOwner (PyObject * obj = nullptr, bool incRef = false) : pyObject(obj)
   {
-    if (incRef)
+    if (incRef && pyObject != nullptr)
       Py_INCREF(pyObject);
   }
 
@@ -85,7 +99,42 @@ public:
   }
 
   /**
+      Copy constructor.
+      \param obj    source object
+  */
+  PyObjectOwner(const PyObjectOwner & obj) : pyObject(obj.pyObject)
+  {
+    if (pyObject != nullptr)
+      Py_INCREF(pyObject);
+  }
+
+  /**
+      Move constructor.
+      \param obj    source object
+  */
+  PyObjectOwner(PyObjectOwner && obj) : pyObject(obj.pyObject)
+  {
+    obj.pyObject = nullptr;
+  }
+
+  /**
+      Assignment operator.
+      \param obj source object
+      \return    reference to this object
+  */
+  PyObjectOwner & operator= (const PyObjectOwner & obj)
+  {
+    if (pyObject != nullptr)
+      Py_DECREF(pyObject);
+    pyObject = obj.pyObject;
+    if (pyObject != nullptr)
+      Py_INCREF(pyObject);
+    return *this;
+  }
+
+  /**
       Provide access to python object.
+      \return reference to pointer to python object
   */
   PyObject *& get (void)
   {
@@ -94,10 +143,23 @@ public:
 
   /**
      Checks if python object is available.
+     \return true, if object is null
   */
-  bool isNull (void)
+  bool isNull (void) const
   {
     return pyObject == nullptr;
+  }
+
+  /**
+     Prepare python object for returning from function (increase its ref count).
+     \return pointer to python object, if null then None object is returned
+  */
+  PyObject * returnValue (void) const
+  {
+    if (pyObject == nullptr)
+      Py_RETURN_NONE;
+    Py_INCREF(pyObject);
+    return pyObject;
   }
 
 protected:

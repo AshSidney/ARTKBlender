@@ -26,10 +26,24 @@ def test_ARHandleConstruct ():
   handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
   return isinstance(handle, ARTKBlender.ARHandle) and handle.pixelFormat == ARTKBlender.ARPixelFormat.RGB
 
-
 def test_ARHandleConstructOtherPixelFormat ():
   param = ARTKBlender.ARParam()
   if not param.load('../../UnitTests/Data/camera_para.dat'):
     return False
   handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.MONO)
   return isinstance(handle, ARTKBlender.ARHandle) and handle.pixelFormat == ARTKBlender.ARPixelFormat.MONO
+
+def test_ARHandleAttachPattern ():
+  param = ARTKBlender.ARParam()
+  if not param.load('../../UnitTests/Data/camera_para.dat'):
+    return False
+  handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
+  if handle.attachPatt is not None:
+    return False
+  pattHandle = ARTKBlender.ARPattHandle()
+  pattHandle.load('../../UnitTests/Data/hiro.patt')
+  handle.attachPatt = pattHandle
+  if handle.attachPatt != pattHandle:
+    return False
+  del handle.attachPatt
+  return handle.attachPatt is None

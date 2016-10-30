@@ -24,6 +24,8 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include <AR/ar.h>
 #include <Python.h>
 
+#include "PyObjectHelper.h"
+
 namespace ARTKBlender
 {
 
@@ -35,6 +37,8 @@ struct PyARHandle
   ARHandle * handle;
   /// lookup table from ARParam
   ARParamLT * paramLT;
+  /// attached pattern handle
+  PyObjectOwner * attachPatt;
 };
 
 // declaration of python module type
