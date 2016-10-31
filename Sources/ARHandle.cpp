@@ -142,16 +142,19 @@ PyObject * PyARHandle_getMarkers(PyARHandle * self, void * closure)
   if (self->updateMarkers)
   {
     self->updateMarkers = false;
-    // get marker data
-    size_t markerCount = arGetMarkerNum(self->handle);
-    ARMarkerInfo * markers = arGetMarker(self->handle);
     // create new tuple of markers
+    size_t markerCount = arGetMarkerNum(self->handle);
     PyObjectOwner pyMarkers (PyTuple_New(markerCount));
-    for (size_t i = 0; i < markerCount; ++i)
+    // get marker data
+    if (markerCount > 0)
     {
-      PyARMarkerInfo * pyMarker = PyObject_New(PyARMarkerInfo, &ARMarkerInfoType);
-      pyMarker->marker = &markers[i];
-      PyTuple_SetItem(pyMarkers.get(), i, getPyObject(pyMarker));
+      ARMarkerInfo * markers = arGetMarker(self->handle);
+      for (size_t i = 0; i < markerCount; ++i)
+      {
+        PyARMarkerInfo * pyMarker = PyObject_New(PyARMarkerInfo, &ARMarkerInfoType);
+        pyMarker->marker = &markers[i];
+        PyTuple_SetItem(pyMarkers.get(), i, getPyObject(pyMarker));
+      }
     }
     // set new tuple
     *self->markers = pyMarkers;

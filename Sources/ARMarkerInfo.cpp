@@ -52,12 +52,20 @@ PyObject * PyARMarkerInfo_getID(PyARMarkerInfo * self, void * closure)
   return PyLong_FromLong(self->marker->id);
 }
 
+// get ID of detected pattern
+PyObject * PyARMarkerInfo_getCF(PyARMarkerInfo * self, void * closure)
+{
+  return PyFloat_FromDouble(self->marker->cf);
+}
+
 
 // members descriptions
 PyGetSetDef PyARMarkerInfo_getseters[] =
 {
   { "id", (getter)PyARMarkerInfo_getID, NULL,
   "pattern ID", NULL },
+  { "cf", (getter)PyARMarkerInfo_getCF, NULL,
+  "detection confidence", NULL },
   { NULL }  /* Sentinel */
 };
 

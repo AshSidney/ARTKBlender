@@ -76,4 +76,8 @@ def test_ARHandleDetect ():
     return 'Marker detection failed'
   if len(handle.markers) != 1:
     return 'One marker should be available'
-  return '' if handle.markers[0].id == 0 else 'Invalid detected pattern ID'
+  if handle.markers[0].id != 0:
+    return 'Invalid detected pattern ID'
+  if handle.markers[0].cf < 0.6:
+    return 'Detected pattern confidence too low'
+  return ''
