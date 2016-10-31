@@ -53,25 +53,15 @@ def test_ARHandleAttachPattern ():
   del handle.attachPatt
   return '' if handle.attachPatt is None else 'No pattern should be attached'
 
-def test_ARHandleDetect ():
-  param = ARTKBlender.ARParam()
-  if not param.load('../../UnitTests/Data/camera_para.dat'):
-    return 'Parameters load failed'
-  imgFile = open('../../UnitTests/Data/hiro_marker.raw', 'rb')
+def loadImage (imgName, imgSize):
+  imgFile = open(imgName, 'rb')
   image = imgFile.read()
   imgFile.close()
-  imgSize = (254, 207)
   if len(image) != imgSize[0] * imgSize[1] * 3:
     return 'Image data have invalid size = ' + str(len(image))
-  param.size = imgSize
-  handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
-  pattHandle = ARTKBlender.ARPattHandle()
-  pattID = pattHandle.load('../../UnitTests/Data/hiro.patt')
-  if pattID != 0:
-    return 'Invalid pattern ID'
-  handle.attachPatt = pattHandle
-  if len(handle.markers) != 0:
-    return 'No markers should be available'
+  return image
+
+def detectMarker (handle, image):
   if not handle.detect(image):
     return 'Marker detection failed'
   if len(handle.markers) != 1:
@@ -80,4 +70,31 @@ def test_ARHandleDetect ():
     return 'Invalid detected pattern ID'
   if handle.markers[0].cf < 0.6:
     return 'Detected pattern confidence too low'
+  return ''
+
+def performMarkerDetection ():
+  param = ARTKBlender.ARParam()
+  if not param.load('../../UnitTests/Data/camera_para.dat'):
+    return 'Parameters load failed'
+  param.size = (254, 207)
+  image = loadImage('../../UnitTests/Data/hiro_marker.raw', param.size)
+  if isinstance(image, str):
+    return image
+  handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
+  pattHandle = ARTKBlender.ARPattHandle()
+  pattID = pattHandle.load('../../UnitTests/Data/hiro.patt')
+  if pattID != 0:
+    return 'Invalid pattern ID'
+  handle.attachPatt = pattHandle
+  if len(handle.markers) != 0:
+    return 'No markers should be available'
+  rslt = detectMarker(handle, image)
+  if rslt != '':
+    return rslt
+  return (handle, param)
+
+def test_ARHandleDetect ():
+  rslt = performMarkerDetection()
+  if isinstance(rslt, str):
+    return rslt
   return ''

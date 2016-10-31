@@ -22,6 +22,7 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include "AR3DHandle.h"
 
 #include "ARParam.h"
+#include "ARMarkerInfo.h"
 #include "PyObjectHelper.h"
 #include "PyTypeRegistration.h"
 
@@ -66,6 +67,56 @@ int PyAR3DHandle_init(PyAR3DHandle * self, PyObject *args, PyObject *kwds)
   return 0;
 }
 
+// return tuple with matrix values
+static PyObject * buildMatrix(double mat[][4])
+{
+  // build matrix rows
+  return Py_BuildValue("((dddd)(dddd)(dddd)(dddd))", mat[0][0], mat[0][1], mat[0][2], mat[0][3],
+    -mat[1][0], -mat[1][1], -mat[1][2], -mat[1][3], -mat[2][0], -mat[2][1], -mat[2][2], -mat[2][3],
+    0.0, 0.0, 0.0, 1.0);
+}
+
+// detect markers in image data
+PyObject * PyAR3DHandle_getTransMatSquare(PyAR3DHandle * self, PyObject * args)
+{
+  // get arguments
+  PyObject * marker;
+  double width;
+  if (!PyArg_ParseTuple(args, "O!d", &ARMarkerInfoType, &marker, &width))
+    Py_RETURN_NONE;
+
+  // process image data to detect markers
+  double mat[3][4];
+  double err = arGetTransMatSquare(self->handle, getPyType<PyARMarkerInfo>(marker)->marker, width, mat);
+
+  // return matrix tuple
+  return buildMatrix(mat);
+}
+
+// detect markers in image data
+PyObject * PyAR3DHandle_getTransMatSquareCont(PyAR3DHandle * self, PyObject * args)
+{
+  // get arguments
+  PyObject * marker;
+  double width;
+  double mat[4][4];
+  if (!PyArg_ParseTuple(args, "O!d((dddd)(dddd)(dddd)(dddd))", &ARMarkerInfoType, &marker, &width,
+      &mat[0][0], &mat[0][1], &mat[0][2], &mat[0][3], &mat[1][0], &mat[1][1], &mat[1][2], &mat[1][3],
+      &mat[2][0], &mat[2][1], &mat[2][2], &mat[2][3], &mat[3][0], &mat[3][1], &mat[3][2], &mat[3][3]))
+    Py_RETURN_NONE;
+
+  // invert values in the second and third row
+  for (size_t i = 1; i < 3; ++i)
+    for (size_t j = 0; j < 4; ++j)
+      mat[i][j] = -mat[i][j];
+
+  // process image data to detect markers
+  double err = arGetTransMatSquareCont(self->handle, getPyType<PyARMarkerInfo>(marker)->marker, mat, width, mat);
+
+  // return matrix tuple
+  return buildMatrix(mat);
+}
+
 
 // members descriptions
 PyGetSetDef PyAR3DHandle_getseters[] =
@@ -78,8 +129,10 @@ PyGetSetDef PyAR3DHandle_getseters[] =
 /// methods descriptions
 PyMethodDef PyAR3DHandle_methods[] =
 {
-  /*{ "load", (PyCFunction)PyARParam_load, METH_VARARGS,
-  "Loads data from file, return true, if successful" },*/
+  { "getTransMatSquare", (PyCFunction)PyAR3DHandle_getTransMatSquare, METH_VARARGS,
+  "Get transformation matrix for detected square marker with specified width." },
+  { "getTransMatSquareCont", (PyCFunction)PyAR3DHandle_getTransMatSquareCont, METH_VARARGS,
+  "Get transformation matrix for detected square marker with specified width continuing from previous matrix." },
   { NULL }  /* Sentinel */
 };
 
@@ -114,7 +167,7 @@ PyTypeObject AR3DHandleType =
   0,                         /* tp_weaklistoffset */
   0,                         /* tp_iter */
   0,                         /* tp_iternext */
-  0, //PyAR3DHandle_methods,        /* tp_methods */
+  PyAR3DHandle_methods,      /* tp_methods */
   0,                         /* tp_members */
   0, //PyAR3DHandle_getseters,      /* tp_getset */
   0,                         /* tp_base */

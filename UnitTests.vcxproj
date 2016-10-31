@@ -181,6 +181,7 @@
     <None Include="UnitTests\Data\camera_para.dat" />
     <None Include="UnitTests\Data\hiro.patt" />
     <None Include="UnitTests\Data\hiro_marker.raw" />
+    <None Include="UnitTests\Data\hiro_marker2.raw" />
     <None Include="UnitTests\Python\AR3DHandleTest.py" />
     <None Include="UnitTests\Python\ARHandleTest.py" />
     <None Include="UnitTests\Python\ARParamTest.py" />
@@ -191,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="UnitTests\Data\hiro_marker.png" />
+    <Image Include="UnitTests\Data\hiro_marker2.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

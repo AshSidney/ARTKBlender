@@ -176,7 +176,7 @@ PyObject * PyARHandle_detect(PyARHandle * self, PyObject * args)
   if (arDetectMarker(self->handle, reinterpret_cast<ARUint8*>(image.buf)) < 0)
     Py_RETURN_FALSE;
 
-  // set flag to update markers;
+  // set flag to update markers
   self->updateMarkers = true;
 
   Py_RETURN_TRUE;
