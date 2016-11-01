@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Blender Sources">
+      <UniqueIdentifier>{47bcbcf9-e685-4a46-b435-c784a7672cdf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\ARParam.cpp">
@@ -64,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="Sources\ARMarkerInfo.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Blender\bgl.h">
+      <Filter>Blender Sources</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

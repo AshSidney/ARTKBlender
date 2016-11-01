@@ -27,6 +27,9 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include "PyObjectHelper.h"
 #include "PyTypeRegistration.h"
 
+#include <bgl.h>
+
+
 namespace ARTKBlender
 {
 
@@ -164,16 +167,38 @@ PyObject * PyARHandle_getMarkers(PyARHandle * self, void * closure)
   return self->markers->returnValue();
 }
 
+// check if object is instance of Blender's bgl.Buffer, then return pointer to raw data, otherwise nullptr
+static ARUint8 * get_bgl_Buffer_data (PyObject * obj)
+{
+  static PyTypeObject * bglBufferType = nullptr;
+  // initialize pointer to bgl.Buffer type
+  if (bglBufferType == nullptr)
+  {
+    if (strcmp(obj->ob_type->tp_name, "bgl.Buffer") == 0)
+      bglBufferType = obj->ob_type;
+    else
+      return nullptr;
+  }
+  // check if type is correct
+  if (obj->ob_type != bglBufferType)
+    return nullptr;
+  // return pointer to buffer
+  return reinterpret_cast<ARUint8*>(getPyType<Buffer>(obj)->buf.asbyte);
+}
+
 // detect markers in image data
 PyObject * PyARHandle_detect(PyARHandle * self, PyObject * args)
 {
   // get image data
-  Py_buffer image;
-  if (!PyArg_ParseTuple(args, "s*", &image))
+  PyObject * image;
+  if (!PyArg_ParseTuple(args, "O", &image))
     Py_RETURN_FALSE;
 
+  // get image buffer
+  ARUint8 * buffer = get_bgl_Buffer_data(image);
+
   // process image data to detect markers
-  if (arDetectMarker(self->handle, reinterpret_cast<ARUint8*>(image.buf)) < 0)
+  if (arDetectMarker(self->handle, buffer) < 0)
     Py_RETURN_FALSE;
 
   // set flag to update markers

@@ -46,7 +46,8 @@ def test_ARHandleAttachPattern ():
   if handle.attachPatt is not None:
     return 'No pattern should be attached'
   pattHandle = ARTKBlender.ARPattHandle()
-  pattHandle.load('../../UnitTests/Data/hiro.patt')
+  if pattHandle.load('../../UnitTests/Data/hiro.patt') != 0:
+    return 'Invalid pattern ID'
   handle.attachPatt = pattHandle
   if handle.attachPatt != pattHandle:
     return 'Invalid pattern attached'
@@ -81,11 +82,10 @@ def performMarkerDetection ():
   if isinstance(image, str):
     return image
   handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
-  pattHandle = ARTKBlender.ARPattHandle()
-  pattID = pattHandle.load('../../UnitTests/Data/hiro.patt')
+  handle.attachPatt = ARTKBlender.ARPattHandle()
+  pattID = handle.attachPatt.load('../../UnitTests/Data/hiro.patt')
   if pattID != 0:
     return 'Invalid pattern ID'
-  handle.attachPatt = pattHandle
   if len(handle.markers) != 0:
     return 'No markers should be available'
   rslt = detectMarker(handle, image)
