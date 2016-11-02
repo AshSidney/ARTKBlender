@@ -21,6 +21,8 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include <AR/ar.h>
 #include <memory>
 
+#include "PyObjectHelper.h"
+
 namespace ARTKBlender
 {
 
@@ -95,6 +97,15 @@ public:
       Destructor releases allocated data.
   */
   virtual ~BlenderBufferHolder (void);
+
+  /**
+      Function to check if source is Blender's blg.Buffer.
+  */
+  static bool isSuitable (PyObject * source);
+
+protected:
+  /// pointer to bgl.Buffer type
+  static PyTypeObject * bglBufferType;
 };
 
     
@@ -114,6 +125,15 @@ public:
       Destructor releases allocated data.
   */
   virtual ~PythonBufferHolder (void);
+
+  /**
+      Function to check if source is python buffer.
+  */
+  static bool isSuitable (PyObject * source);
+
+protected:
+  /// python buffer structure
+  Py_buffer pyBuffer;
 };
 
 
