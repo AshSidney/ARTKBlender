@@ -18,7 +18,7 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include "BlenderUtils.h"
 
 #include <cstring>
-#include "Blender/bgl.h"
+#include "../Blender/bgl.h"
 
 namespace ARTKBlender
 {
@@ -33,12 +33,13 @@ ImageBufferHolder::~ImageBufferHolder (void)
 {}
 
 
-BlenderBufferHolder::BlenderBufferHolder (PyObject * source)
-  : ImageBufferHolder(source)
+BlenderBufferHolder::BlenderBufferHolder (PyObject * source) : ImageBufferHolder(source)
 {
   Buffer * buffer = getPyType<Buffer>(sourceObj.get());
-  data = reinterpret_cast<ARUint8>(buffer->buf.asbyte);
-  //TODO dataSize = 1;
+  data = reinterpret_cast<ARUint8*>(buffer->buf.asbyte);
+  dataSize = 1;
+  for (size_t i = 0; i < buffer->ndimensions; ++i)
+    dataSize *= buffer->dimensions[i];
 }
 
 BlenderBufferHolder::~BlenderBufferHolder (void)
@@ -51,30 +52,29 @@ bool BlenderBufferHolder::isSuitable (PyObject * source)
   // try to initialize pointer to bgl.Buffer type
   if (bglBufferType == nullptr)
   {
-    if (strcmp(obj->ob_type->tp_name, "bgl.Buffer") == 0)
-      bglBufferType = obj->ob_type;
+    if (strcmp(source->ob_type->tp_name, "bgl.Buffer") == 0)
+      bglBufferType = source->ob_type;
     else
       return false;
   }
   // check if type is correct
-  return obj->ob_type == bglBufferType;
+  return source->ob_type == bglBufferType;
 }
 
 
-PythonBufferHolder::PythonBufferHolder (PyObject * source)
-  : ImageBufferObject(source)
+PythonBufferHolder::PythonBufferHolder (PyObject * source) : ImageBufferHolder(source)
 {
   // get buffer from object
   if (PyObject_GetBuffer(sourceObj.get(), &pyBuffer, PyBUF_SIMPLE) == 0)
   {
     data = reinterpret_cast<ARUint8*>(pyBuffer.buf);
-    dataSize = pyBuffer.length;
+    dataSize = pyBuffer.len;
   }
 }
 
 PythonBufferHolder::~PythonBufferHolder (void)
 {
-  PyBuffer_Release(pyBuffer);
+  PyBuffer_Release(&pyBuffer);
 }
 
 bool PythonBufferHolder::isSuitable (PyObject * source)
@@ -86,10 +86,10 @@ bool PythonBufferHolder::isSuitable (PyObject * source)
 std::unique_ptr<ImageBufferHolder> getBufferHolder (PyObject * source)
 {
   // check if it's blender buffer
-  if (BlenderBufferHolder::isSuitable(source)
+  if (BlenderBufferHolder::isSuitable(source))
     return std::unique_ptr<ImageBufferHolder>(new BlenderBufferHolder(source));
   // check if it's python buffer
-  if (PythonBufferHolder::isSuitable(source)
+  if (PythonBufferHolder::isSuitable(source))
     return std::unique_ptr<ImageBufferHolder>(new PythonBufferHolder(source));
   // otherwise return empty pointer
   return std::unique_ptr<ImageBufferHolder>();

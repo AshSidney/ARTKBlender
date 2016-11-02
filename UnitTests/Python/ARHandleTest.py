@@ -54,11 +54,11 @@ def test_ARHandleAttachPattern ():
   del handle.attachPatt
   return '' if handle.attachPatt is None else 'No pattern should be attached'
 
-def loadImage (imgName, imgSize):
+def loadImage (imgName, imgSize, pixSize):
   imgFile = open(imgName, 'rb')
   image = imgFile.read()
   imgFile.close()
-  if len(image) != imgSize[0] * imgSize[1] * 3:
+  if len(image) != imgSize[0] * imgSize[1] * pixSize:
     return 'Image data have invalid size = ' + str(len(image))
   return image
 
@@ -78,7 +78,7 @@ def performMarkerDetection ():
   if not param.load('../../UnitTests/Data/camera_para.dat'):
     return 'Parameters load failed'
   param.size = (254, 207)
-  image = loadImage('../../UnitTests/Data/hiro_marker.raw', param.size)
+  image = loadImage('../../UnitTests/Data/hiro_marker.raw', param.size, 3)
   if isinstance(image, str):
     return image
   handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGB)
@@ -98,3 +98,22 @@ def test_ARHandleDetect ():
   if isinstance(rslt, str):
     return rslt
   return ''
+
+def test_ARHandleDetect_Camera ():
+  param = ARTKBlender.ARParam()
+  if not param.load('../../UnitTests/Data/camera_para.dat'):
+    return 'Parameters load failed'
+  param.size = (640, 480)
+  image = loadImage('../../UnitTests/Data/test_image.raw', param.size, 4)
+  if isinstance(image, str):
+    return image
+  handle = ARTKBlender.ARHandle(param, ARTKBlender.ARPixelFormat.RGBA)
+  handle.attachPatt = ARTKBlender.ARPattHandle()
+  if not handle.detect(image):
+    return 'First detection failed'
+  pattID = handle.attachPatt.load('../../UnitTests/Data/4x4_42.patt')
+  if pattID != 0:
+    return 'Invalid pattern ID'
+  if not handle.detect(image):
+    return 'Second detection failed'
+  return '' if len(handle.markers) > 0 else 'No marker detected'

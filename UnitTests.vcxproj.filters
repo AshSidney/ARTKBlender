@@ -45,6 +45,12 @@
     <ClCompile Include="UnitTests\ARPattHandleTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\BlenderUtils.cpp">
+      <Filter>Tested Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTests\BlenderUtilsTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="UnitTests\Python\ARParamTest.py">
@@ -71,9 +77,18 @@
     <None Include="UnitTests\Data\hiro_marker2.raw">
       <Filter>Data Files</Filter>
     </None>
+    <None Include="UnitTests\Data\4x4_42.patt">
+      <Filter>Data Files</Filter>
+    </None>
+    <None Include="UnitTests\Data\test_image.raw">
+      <Filter>Data Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UnitTests\PyTestHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTests\MockPyTypeRegistration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -82,6 +97,9 @@
       <Filter>Data Files</Filter>
     </Image>
     <Image Include="UnitTests\Data\hiro_marker2.png">
+      <Filter>Data Files</Filter>
+    </Image>
+    <Image Include="UnitTests\Data\test_image.png">
       <Filter>Data Files</Filter>
     </Image>
   </ItemGroup>

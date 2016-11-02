@@ -42,6 +42,9 @@
     <ClCompile Include="Sources\ARMarkerInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\BlenderUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\PyTypeRegistration.h">
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="Blender\bgl.h">
       <Filter>Blender Sources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\BlenderUtils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

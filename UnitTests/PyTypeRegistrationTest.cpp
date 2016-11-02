@@ -24,81 +24,13 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #include "PyTypeRegistration.h"
 #include "PyObjectHelper.h"
 
+#include "MockPyTypeRegistration.h"
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace UnitTests
 {
-
-/**
-*   Mock class for PyTypeRegistration allows to test its static functions.
-*/
-class MockPyTypeRegistration : public ARTKBlender::PyTypeRegistration
-{
-public:
-  /**
-      Constructor for mock object.
-      \param name name of python type
-  */
-  MockPyTypeRegistration (const char * name, bool ready = true)
-    : PyTypeRegistration(name, testPyType), isReady(ready), callFlags(0)
-  {}
-
-  /**
-      Method to prepare type. In mock class is empty.
-      \return true, if this type was successfully prepared
-  */
-  virtual bool getReady (void)
-  {
-    ++callFlags;
-    return isReady;
-  }
-
-  /**
-      Method to add type to module. In mock class is empty.
-      \module module object
-  */
-  virtual void addType (PyObject * module)
-  {
-    callFlags += 2;
-  }
-
-  /**
-  Method to get next type in list.
-  \return next type in list or nullptr, if this is the last one
-  */
-  MockPyTypeRegistration * next (void)
-  {
-    return static_cast<MockPyTypeRegistration*>(nextType);
-  }
-
-  /**
-      Provide call flags.
-      \return flags value
-  */
-  short getCallFlags (void)
-  {
-    return callFlags;
-  }
-
-  /**
-      Provide the first item in list of registration objects.
-      \return pointer to the first object
-  */
-  static PyTypeRegistration *& getFirstType()
-  {
-    return firstType;
-  }
-
-protected:
-  /// testing python type data
-  PyTypeObject testPyType;
-  /// flag to be returned by getReady() method
-  bool isReady;
-  /// flags indicating getReady() and addType() methods were called
-  short callFlags;
-};
-
 
 // test class for PyTypeRegistration with mock class
 TEST_CLASS(PyTypeRegistrationTests)

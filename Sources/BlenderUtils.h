@@ -47,7 +47,7 @@ public:
       Provides pointer to buffer.
       \return pointer to image in buffer
   */
-  ARUint8 getData (void)
+  ARUint8 * getData (void)
   {
     return data;
   }

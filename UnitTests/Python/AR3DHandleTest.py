@@ -63,7 +63,7 @@ def test_AR3DHandleCalcMatrixCont ():
   rslt = checkMatrix(mat, vecs, (7.0, 13.0, -270.0))
   if rslt != '':
     return rslt
-  image = ARHandleTest.loadImage('../../UnitTests/Data/hiro_marker2.raw', param.size)
+  image = ARHandleTest.loadImage('../../UnitTests/Data/hiro_marker2.raw', param.size, 3)
   if isinstance(image, str):
     return image
   rslt = ARHandleTest.detectMarker(handle, image)

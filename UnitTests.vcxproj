@@ -169,30 +169,36 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\BlenderUtils.cpp" />
     <ClCompile Include="Sources\PyTypeRegistration.cpp" />
     <ClCompile Include="UnitTests\AR3DHandleTest.cpp" />
     <ClCompile Include="UnitTests\ARHandleTest.cpp" />
     <ClCompile Include="UnitTests\ARParamTest.cpp" />
     <ClCompile Include="UnitTests\ARPattHandleTest.cpp" />
+    <ClCompile Include="UnitTests\BlenderUtilsTest.cpp" />
     <ClCompile Include="UnitTests\PyTestHelper.cpp" />
     <ClCompile Include="UnitTests\PyTypeRegistrationTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="UnitTests\Data\4x4_42.patt" />
     <None Include="UnitTests\Data\camera_para.dat" />
     <None Include="UnitTests\Data\hiro.patt" />
     <None Include="UnitTests\Data\hiro_marker.raw" />
     <None Include="UnitTests\Data\hiro_marker2.raw" />
+    <None Include="UnitTests\Data\test_image.raw" />
     <None Include="UnitTests\Python\AR3DHandleTest.py" />
     <None Include="UnitTests\Python\ARHandleTest.py" />
     <None Include="UnitTests\Python\ARParamTest.py" />
     <None Include="UnitTests\Python\ARPattHandleTest.py" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="UnitTests\MockPyTypeRegistration.h" />
     <ClInclude Include="UnitTests\PyTestHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="UnitTests\Data\hiro_marker.png" />
     <Image Include="UnitTests\Data\hiro_marker2.png" />
+    <Image Include="UnitTests\Data\test_image.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
