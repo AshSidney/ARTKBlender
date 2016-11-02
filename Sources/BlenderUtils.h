@@ -18,17 +18,110 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include <Python.h>
+#include <AR/ar.h>
+#include <memory>
 
 namespace ARTKBlender
 {
 
 /**
-    Get image raw data from python object. Source can be stores as bytes
-    or it can be Blender's bgl.Buffer object
-    \param data pointer to image data
-    \param size image data size (in bytes)
-    \return true, if succeded
+    Base class to hold python buffer containing image data.
 */
-bool getImageData (ARUint8 *& data, size_t & size);
+class ImageBufferHolder
+{
+public:
+  /**
+      Constructor retrieves buffer from source data.
+      /param source source python object
+  */
+  ImageBufferHolder (PyObject * source);
+
+  /**
+      Destructor releases allocated data.
+  */
+  virtual ~ImageBufferHolder (void);
+
+  /**
+      Provides pointer to buffer.
+      \return pointer to image in buffer
+  */
+  ARUint8 getData (void)
+  {
+    return data;
+  }
+
+  /**
+      Provides size of buffer.
+      \return size of buffer in bytes
+  */
+  size_t getSize (void)
+  {
+      return dataSize;
+  }
+
+  /**
+      Validates buffer and its size.
+      \param required data size, if 0, size is not checked.
+      \return true, if buffer is valid and has required size.
+  */
+  bool isValid (size_t reqSize)
+  {
+    return data != nullptr && (dataSize == reqSize || reqSize == 0);
+  }
+  
+protected:
+  /// source object containing buffer
+  PyObjectOwner sourceObj;
+  /// pointer to image data
+  ARUint8 * data;
+  /// size of image data
+  size_t dataSize;
+};
+
+
+/**
+    Class holding image buffer from Blender's bgl.Buffer.
+*/
+class BlenderBufferHolder : public ImageBufferHolder
+{
+public:
+  /**
+      Constructor retrieves buffer from source data.
+      /param source source python object
+  */
+  BlenderBufferHolder (PyObject * source);
+
+  /**
+      Destructor releases allocated data.
+  */
+  virtual ~BlenderBufferHolder (void);
+};
+
+    
+/**
+    Class holding python's buffer.
+*/
+class PythonBufferHolder : public ImageBufferHolder
+{
+public:
+  /**
+      Constructor retrieves buffer from source data.
+      /param source source python object
+  */
+  PythonBufferHolder (PyObject * source);
+
+  /**
+      Destructor releases allocated data.
+  */
+  virtual ~PythonBufferHolder (void);
+};
+
+
+/**
+    Function to create appropriate type of buffer holder
+    \param source source python object
+    \return pointer to image holder
+*/
+std::unique_ptr<ImageBufferHolder> getBufferHolder (PyObject * source);
 
 }
