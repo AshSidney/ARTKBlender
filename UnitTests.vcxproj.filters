@@ -88,9 +88,6 @@
     <ClInclude Include="UnitTests\PyTestHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UnitTests\MockPyTypeRegistration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="UnitTests\Data\hiro_marker.png">

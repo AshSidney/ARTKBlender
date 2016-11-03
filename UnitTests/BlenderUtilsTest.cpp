@@ -19,33 +19,14 @@ along with ARTKBlender.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "BlenderUtils.h"
 #include "PyTypeRegistration.h"
+#include "PyObjectHelper.h"
 #include "../Blender/bgl.h"
-
-#include "MockPyTypeRegistration.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 
 namespace UnitTests
 {
-
-// test class for ImageBufferHolder
-TEST_CLASS(ImageBufferHolderTests)
-{
-public:
-  TEST_METHOD(ImageBufferHolder_SourceOwner)
-  {
-    PyObject * src = PyBytes_FromString("test data");
-    Assert::IsTrue(src->ob_refcnt == 1);
-    {
-      ARTKBlender::ImageBufferHolder testHolder(src);
-      Assert::Assert::IsTrue(src->ob_refcnt == 2);
-    }
-    Assert::IsTrue(src->ob_refcnt == 1);
-    Py_DECREF(src);
-  }
-};
-
 
 // test bgl.Buffer registration data
 PyTypeObject BGL_bufferType =
@@ -77,7 +58,6 @@ PyTypeObject BGL_bufferType =
 // test buffer content
 char testData[] = "| first  | second | third  | fourth";
 
-
 // function to create python buffer
 PyObject * createPythonBuffer()
 {
@@ -94,14 +74,26 @@ PyObject * createBlenderBuffer()
   src->ndimensions = 1;
   static int dimension = sizeof(testData);
   src->dimensions = &dimension;
-  MockPyTypeRegistration::getFirstType() = nullptr;
   return (PyObject*)src;
 }
 
 
-TEST_CLASS(PythonBufferHolderTests)
+// test class for ImageBufferHolder
+TEST_CLASS(ImageBufferHolderTests)
 {
 public:
+  TEST_METHOD(ImageBufferHolder_SourceOwner)
+  {
+    PyObject * src = PyBytes_FromString(testData);
+    Assert::IsTrue(src->ob_refcnt == 1);
+    {
+      ARTKBlender::ImageBufferHolder testHolder(src);
+      Assert::Assert::IsTrue(src->ob_refcnt == 2);
+    }
+    Assert::IsTrue(src->ob_refcnt == 1);
+    Py_DECREF(src);
+  }
+
   TEST_METHOD(PythonBufferHolder_SourceOwner)
   {
     PyObject * src = createPythonBuffer();
@@ -114,15 +106,6 @@ public:
     for (size_t i = 0; i < sizeof(testData); ++i)
       Assert::IsTrue(testHolder.getData()[i] == testData[i]);
     Py_DECREF(src);
-  }
-};
-
-TEST_CLASS(BlenderBufferHolderTests)
-{
-public:
-  TEST_METHOD_CLEANUP(ClearTypes)
-  {
-    MockPyTypeRegistration::getFirstType() = nullptr;
   }
 
   TEST_METHOD(BlenderBufferHolder_SourceOwner)
@@ -137,6 +120,29 @@ public:
     for (size_t i = 0; i < sizeof(testData); ++i)
       Assert::IsTrue(testHolder.getData()[i] == testData[i]);
     Py_DECREF(src);
+  }
+
+  TEST_METHOD(PythonBufferHolder_getImageHolder)
+  {
+    ARTKBlender::PyObjectOwner src (createPythonBuffer());
+    auto holder = ARTKBlender::getBufferHolder(src.get());
+    Assert::IsNotNull(dynamic_cast<ARTKBlender::PythonBufferHolder*>(holder.get()));
+    Assert::IsNull(dynamic_cast<ARTKBlender::BlenderBufferHolder*>(holder.get()));
+  }
+
+  TEST_METHOD(BlenderBufferHolder_getImageHolder)
+  {
+    ARTKBlender::PyObjectOwner src(createBlenderBuffer());
+    auto holder = ARTKBlender::getBufferHolder(src.get());
+    Assert::IsNull(dynamic_cast<ARTKBlender::PythonBufferHolder*>(holder.get()));
+    Assert::IsNotNull(dynamic_cast<ARTKBlender::BlenderBufferHolder*>(holder.get()));
+  }
+
+  TEST_METHOD(NoBufferHolder_getImageHolder)
+  {
+    ARTKBlender::PyObjectOwner src(PyUnicode_FromString(testData));
+    auto holder = ARTKBlender::getBufferHolder(src.get());
+    Assert::IsNull(holder.get());
   }
 };
 

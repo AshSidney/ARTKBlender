@@ -32,10 +32,26 @@ PyTypeRegistration * PyTypeRegistration::firstType = nullptr;
 
 // constructor
 PyTypeRegistration::PyTypeRegistration (const char * name, PyTypeObject & data)
-  : typeName(name), typeData(data), nextType(firstType)
+  : typeName(name), typeData(data), nextType(firstType), prevType(nullptr)
 {
   // store type as first
   firstType = this;
+  // add itself as previous type to the next one
+  if (nextType != nullptr)
+    nextType->prevType = this;
+}
+
+// destructor
+PyTypeRegistration::~PyTypeRegistration(void)
+{
+  // interconnect neighbor types in linked list
+  if (prevType != nullptr)
+    prevType->nextType = nextType;
+  if (nextType != nullptr)
+    nextType->prevType = prevType;
+  // if this is first type, reset pointer to it
+  if (firstType == this)
+    firstType = nextType;
 }
 
 // prepare python type for registration
@@ -51,8 +67,6 @@ void PyTypeRegistration::addType (PyObject * module)
   PyModule_AddObject(module, typeName, (PyObject *)&typeData);
 }
 
-//
-
 // prepare all types
 bool PyTypeRegistration::getAllReady (void)
 {
@@ -67,7 +81,6 @@ void PyTypeRegistration::addAllTypes (PyObject * module)
 {
   for (auto currType = firstType; currType != nullptr; currType = currType->nextType)
     currType->addType(module);
-  firstType = nullptr;
 }
 
 

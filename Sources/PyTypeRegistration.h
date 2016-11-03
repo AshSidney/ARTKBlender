@@ -38,11 +38,16 @@ class PyTypeRegistration
 {
 public:
   /**
-      Constructor
+      Constructor stores data and adds object to linked list.
       \param typeName name of python class
       \param typeData description of python class
   */
   PyTypeRegistration (const char * name, PyTypeObject & data);
+
+  /**
+      Destructor releases object from linked list.
+  */
+  ~PyTypeRegistration (void);
 
   /**
       Function to prepare all registered types.
@@ -61,8 +66,10 @@ protected:
   const char * typeName;
   /// data for python type description
   PyTypeObject & typeData;
-  /// the next type object
+  /// next type object in linked list
   PyTypeRegistration * nextType;
+  /// previous type object in linked list
+  PyTypeRegistration * prevType;
 
   /**
       Method to prepare type.
