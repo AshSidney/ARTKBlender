@@ -55,13 +55,13 @@ PyTypeRegistration::~PyTypeRegistration(void)
 }
 
 // prepare python type for registration
-bool PyTypeRegistration::getReady (void)
+bool PyTypeRegistration::getReady (void) const
 {
   return PyType_Ready(&typeData) == 0;
 }
 
 // add python type to module
-void PyTypeRegistration::addType (PyObject * module)
+void PyTypeRegistration::addType (PyObject * module) const
 {
   Py_INCREF(&typeData);
   PyModule_AddObject(module, typeName, (PyObject *)&typeData);
@@ -92,7 +92,7 @@ PyTypeRegistrationEnum::PyTypeRegistrationEnum (const char * name, PyTypeObject 
 {}
 
 // preparing python type
-bool PyTypeRegistrationEnum::getReady(void)
+bool PyTypeRegistrationEnum::getReady(void) const
 {
   // prepare type
   if (!PyTypeRegistration::getReady())

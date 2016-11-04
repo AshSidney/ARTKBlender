@@ -75,13 +75,13 @@ protected:
       Method to prepare type.
       \return true, if this type was successfully prepared
   */
-  virtual bool getReady (void);
+  virtual bool getReady (void) const;
 
   /**
       Method to add type to module.
       \module module object
   */
-  virtual void addType (PyObject * module);
+  virtual void addType (PyObject * module) const;
 
 
   /// global pointer to list of types to be registered in module
@@ -114,7 +114,7 @@ protected:
   Method to prepare type.
   \return true, if this type was successfully prepared
   */
-  virtual bool getReady (void);
+  virtual bool getReady (void) const;
 };
 
 }

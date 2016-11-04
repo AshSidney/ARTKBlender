@@ -48,7 +48,7 @@ public:
       Method to prepare type. In mock class is empty.
       \return true, if this type was successfully prepared
   */
-  virtual bool getReady(void)
+  virtual bool getReady(void) const
   {
     ++callFlags;
     return isReady;
@@ -58,7 +58,7 @@ public:
       Method to add type to module. In mock class is empty.
       \module module object
   */
-  virtual void addType(PyObject * module)
+  virtual void addType(PyObject * module) const
   {
     callFlags += 2;
   }
@@ -96,7 +96,7 @@ protected:
   /// flag to be returned by getReady() method
   bool isReady;
   /// flags indicating getReady() and addType() methods were called
-  short callFlags;
+  mutable short callFlags;
 };
 
 

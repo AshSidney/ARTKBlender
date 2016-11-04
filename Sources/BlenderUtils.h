@@ -47,7 +47,7 @@ public:
       Provides pointer to buffer.
       \return pointer to image in buffer
   */
-  ARUint8 * getData (void)
+  ARUint8 * getData (void) const
   {
     return data;
   }
@@ -56,7 +56,7 @@ public:
       Provides size of buffer.
       \return size of buffer in bytes
   */
-  size_t getSize (void)
+  size_t getSize (void) const
   {
       return dataSize;
   }
@@ -66,7 +66,7 @@ public:
       \param required data size, if 0, size is not checked.
       \return true, if buffer is valid and has required size.
   */
-  bool isValid (size_t reqSize)
+  bool isValid (size_t reqSize) const
   {
     return data != nullptr && (dataSize == reqSize || reqSize == 0);
   }
